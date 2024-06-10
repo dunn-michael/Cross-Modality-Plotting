@@ -130,8 +130,18 @@ def on_press(key):
 #     print 'x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse)
 #     print 'Data point:', x[ind[0]], y[ind[0]]
 
+
 def on_pick(event):
-    print(event.artist.obj.name)
+    artist = event.artist
+    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
+    x, y = artist.get_xdata(), artist.get_ydata()
+    ind = event.ind
+    # print 'Artist picked:', event.artist
+    # print '{} vertices picked'.format(len(ind))
+    # print 'Pick between vertices {} and {}'.format(min(ind), max(ind)+1)
+    print('x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse))
+    # print 'Data point:', x[ind[0]], y[ind[0]]
+    # print
 
 
 
@@ -140,7 +150,7 @@ def main():
     global quitGraph
     quitGraph = False
     startUp = 0
-
+    switch = 0
     # Load the data into the program and intiliaze
     # it into lists
     courseInfo = np.load('course-info.npy')
@@ -220,11 +230,11 @@ def main():
         # fig.canvas.callbacks.connect('pick_event', on_pick)
 
         # Function for keystrokes
-        with Listener(
-            on_press=on_press
-            # on_release=on_release
-            ) as listener:
-                listener.join()
+        # with Listener(
+        #     on_press=on_press
+        #     # on_release=on_release
+        #     ) as listener:
+        #         listener.join()
         
         data = npzfile['arr_1'][index]
 
@@ -252,7 +262,10 @@ def main():
                 sizes[index] = 20
                 index += 1
                 switch = 0
+        tolerance = 10 # points
+        # ax.plot(range(10), 'ro-', picker=tolerance)
 
+        fig.canvas.callbacks.connect('pick_event', on_pick)
 
         z_order[index] = 2
         color[index] = 7
