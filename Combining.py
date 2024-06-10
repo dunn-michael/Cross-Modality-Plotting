@@ -118,6 +118,22 @@ def on_press(key):
     elif key == Key.left:
         switch = 2
         return False
+    
+# def on_pick(event):
+#     artist = event.artist
+#     xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
+#     x, y = artist.get_xdata(), artist.get_ydata()
+#     ind = event.ind
+#     print 'Artist picked:', event.artist
+#     print '{} vertices picked'.format(len(ind))
+#     print 'Pick between vertices {} and {}'.format(min(ind), max(ind)+1)
+#     print 'x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse)
+#     print 'Data point:', x[ind[0]], y[ind[0]]
+
+def on_pick(event):
+    print(event.artist.obj.name)
+
+
 
 def main():
     global switch
@@ -137,7 +153,7 @@ def main():
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
     j = 0
-
+    location = []
     # This is for only getting the timestamps that have graphs accociated.
     # This way we aren't generating thousand of other points on the scatterplot
     for i in range(len(npzfile['arr_0'])):
@@ -148,6 +164,7 @@ def main():
                 found = True
                 lat.append(courseInfo[j][0])
                 long.append(courseInfo[j][1])
+                # location.append([courseInfo[j][1], courseInfo[j][0]])
                 timestamp.append(courseInfo[j][2])
                 heading.append(courseInfo[j][3])
             if j < len(courseInfo) - 1:
@@ -191,11 +208,16 @@ def main():
             color[index] = 7
             sizes[index] = 90
             ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+            # ax2.scatter(location, c = color,s=sizes, cmap=plt.cm.jet)
             plot.set_array(np.asarray(data).reshape(height, width))
             fig.canvas.draw()
             fig.canvas.flush_events()
             plt.show()
             startUp += 1
+
+        # artist = ax.plot(long, lat, 'ro', picker=5)[0]
+
+        # fig.canvas.callbacks.connect('pick_event', on_pick)
 
         # Function for keystrokes
         with Listener(
@@ -237,6 +259,7 @@ def main():
         sizes[index] = 90
         plot.set_array(np.asarray(data).reshape(height, width))
         ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+        # ax2.scatter(location, c = color,s=sizes, cmap=plt.cm.jet)
         fig.canvas.draw()
         fig.canvas.flush_events()
         plt.show()
@@ -246,3 +269,17 @@ def main():
 
 
 main()
+
+
+
+
+
+
+
+
+# tolerance = 10 # points
+# ax.plot(range(10), 'ro-', picker=tolerance)
+
+# fig.canvas.callbacks.connect('pick_event', on_pick)
+
+# plt.show()
