@@ -97,11 +97,17 @@ def update_mode(mode, part_num):
             exit()
 
 
-def on_release(key):
+
+def on_press(key):
+    '''This Function looks for any keypresses
+        Only reacts to the keystrokes that have
+        been
+        
+        These are Escape, right arrow, left arrow'''
     global switch
     global quitGraph
-    print('{0} release'.format(
-        key))
+    # print('{0} release'.format(
+        # key))
     if key == Key.esc:
         quitGraph = True
         return False
@@ -119,19 +125,21 @@ def main():
     quitGraph = False
     startUp = 0
 
+    # Load the data into the program and intiliaze
+    # it into lists
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
-    # print(len(npzfile['arr_1']))
-    index = 0
+    index = 1000
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
-    # print(data[1])
     height = npzfile['arr_3'][index]
     width = npzfile['arr_2'][index]
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
     j = 0
 
+    # This is for only getting the timestamps that have graphs accociated.
+    # This way we aren't generating thousand of other points on the scatterplot
     for i in range(len(npzfile['arr_0'])):
         found = False
         while not found:
@@ -147,17 +155,14 @@ def main():
             else:
                 break
 
-
+    # The file could have different modes in it, this will update the size of the graph if the mode is different
     update_mode(mode, partNumber)
-    # plt.subplot(2,1,2)
+
+    # Functions that setup the polar and cartesian graphs
     plt.ion()
-    # fig, ax = plt.subplots(122,subplot_kw=dict(projection='polar'), figsize=(9,9))
-    # fig, ax = plt.subplots(subplot_kw=dict(projection='polar'), figsize=(9,9))
     fig = plt.figure()
-    # fig, (ax,ax2) = plt.subplots(1,2,subplot_kw=dict(projection='polar'))
     ax2 = fig.add_subplot(121)
     ax = fig.add_subplot(122,projection='polar')
-    # ax2.projection = 'caresian'
     ax.set_thetamin(-horizontal_aperture/2)
     ax.set_thetamax(horizontal_aperture/2)
     theta = np.linspace(-horizontal_aperture/2, horizontal_aperture/2, width)*np.pi/180
@@ -166,18 +171,21 @@ def main():
     z = np.zeros_like(T)
     plot = ax.pcolormesh(T, R, z, cmap='gray', shading='auto', vmin=0, vmax=100)
     ax.set_theta_zero_location("N")
-    # Sets the y_lim to match the current range of the sonar
     ax.set_ylim(range_min, range_max)
-    # plot.set_array((np.asarray(data).reshape(height, width)))
-    # fig.canvas.draw()
-    # fig.canvas.flush_events()
 
+    # Initializes the color, size and z order of the scatterpoint plot
     sizes = [20]*len(long)
     color = [10]*len(long)
     z_order = [1]*len(long)
+
     while True:
+        # If esc is pressed
         if quitGraph:
             break
+
+        # Without this the graph wouldn't initialize properly
+        # NOTE: It hasn't properly initiliazed since I added in the keystroke detection
+        # Without this the graph works great
         if(startUp == 0):
             z_order[index] = 2
             color[index] = 7
@@ -189,19 +197,23 @@ def main():
             plt.show()
             startUp += 1
 
+        # Function for keystrokes
         with Listener(
-            # on_press=on_press,
-            on_release=on_release) as listener:
+            on_press=on_press
+            # on_release=on_release
+            ) as listener:
                 listener.join()
-        # ax2.scatter(long,lat,zorder = z_order, c = color,s=sizes, cmap=plt.cm.jet)
-
         
-        # plt.subplot(2,1,2)
         data = npzfile['arr_1'][index]
+
+        # NOTE: Remnant from when the code was terminal driven, if you would like this back comment out the
+        # with listener code and uncomment the direction based if statements. Also comment out the if
+        # statements that have switch included
         # direction = input('L or R : ').lower()    
         # if(direction == 'l'):
         if switch == 2:
             if index != 0:
+                # Supposed to reset the points that are no longer selected. This semi resets them
                 z_order[index] = 1
                 color[index] = 10
                 sizes[index] = 20
@@ -218,6 +230,8 @@ def main():
                 sizes[index] = 20
                 index += 1
                 switch = 0
+
+
         z_order[index] = 2
         color[index] = 7
         sizes[index] = 90
@@ -226,24 +240,7 @@ def main():
         fig.canvas.draw()
         fig.canvas.flush_events()
         plt.show()
-
-        # plt.subplot(2,1,1)
-        # sizes[index] = 90
-        # color[index] = 7
-        # z_order[index] = 2
-
-        # for i in range(len(z_order)):
-        #     if i == index:
-        #         z_order[i] = 2
-        #         color[i] = 7
-        #         sizes[i] = 90
-        #         print("entered")
-        #     else:
-        #         z_order[i] = 1
-        #         color[i] = 10
-        #         sizes[i] = 20
                 
-
         # time.sleep(.01)
 
 
