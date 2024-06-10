@@ -99,22 +99,24 @@ def update_mode(mode, part_num):
 
 def on_release(key):
     global switch
-    # global quitGraph
+    global quitGraph
     print('{0} release'.format(
         key))
-    if key == Key.right:
+    if key == Key.esc:
+        quitGraph = True
+        return False
+    elif key == Key.right:
         switch = 1
         return False
     
     elif key == Key.left:
         switch = 2
         return False
-    # elif key == Key.esc:
-        # quitGraph = True
+
 def main():
     global switch
-    # global quitGraph
-    # quitGraph = False
+    global quitGraph
+    quitGraph = False
     startUp = 0
 
     courseInfo = np.load('course-info.npy')
@@ -174,8 +176,9 @@ def main():
     color = [10]*len(long)
     z_order = [1]*len(long)
     while True:
+        if quitGraph:
+            break
         if(startUp == 0):
-            print("entered")
             z_order[index] = 2
             color[index] = 7
             sizes[index] = 90
@@ -184,15 +187,12 @@ def main():
             fig.canvas.draw()
             fig.canvas.flush_events()
             plt.show()
-            print("graphed")
             startUp += 1
 
         with Listener(
             # on_press=on_press,
             on_release=on_release) as listener:
                 listener.join()
-        # if quitGraph:
-            # quit
         # ax2.scatter(long,lat,zorder = z_order, c = color,s=sizes, cmap=plt.cm.jet)
 
         
