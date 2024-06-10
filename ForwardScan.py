@@ -167,7 +167,6 @@ def main():
         plot.set_array((data.reshape(height, width)))
         fig.canvas.draw()
         fig.canvas.flush_events()
-        # plt.show()
         # time.sleep(.01)
 
 

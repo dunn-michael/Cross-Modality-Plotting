@@ -98,19 +98,19 @@ def update_mode(mode, part_num):
 
 def main():
 
+    startUp = 0
+
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
     print(len(npzfile['arr_1']))
-    index = 100
+    index = 1000
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
     print(data[1])
-    height = npzfile['arr_2'][index]
-    width = npzfile['arr_3'][index]
+    height = npzfile['arr_3'][index]
+    width = npzfile['arr_2'][index]
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
-    # print(width,height)
-    # print(len(data))
     j = 0
 
     for i in range(len(npzfile['arr_0'])):
@@ -135,8 +135,9 @@ def main():
     # fig, ax = plt.subplots(122,subplot_kw=dict(projection='polar'), figsize=(9,9))
     # fig, ax = plt.subplots(subplot_kw=dict(projection='polar'), figsize=(9,9))
     fig = plt.figure()
-    ax = plt.subplots(122,subplot_kw=dict(projection='polar'))
-    ax2 = plt.subplot(121)
+    # fig, (ax,ax2) = plt.subplots(1,2,subplot_kw=dict(projection='polar'))
+    ax2 = fig.add_subplot(121)
+    ax = fig.add_subplot(122,projection='polar')
     # ax2.projection = 'caresian'
     ax.set_thetamin(-horizontal_aperture/2)
     ax.set_thetamax(horizontal_aperture/2)
@@ -148,37 +149,72 @@ def main():
     ax.set_theta_zero_location("N")
     # Sets the y_lim to match the current range of the sonar
     ax.set_ylim(range_min, range_max)
-    plot.set_array((np.asarray(data).reshape(width, height).T))
-    fig.canvas.draw()
-    fig.canvas.flush_events()
-    # plt.show()
-    # plt.show()
+    # plot.set_array((np.asarray(data).reshape(height, width)))
+    # fig.canvas.draw()
+    # fig.canvas.flush_events()
 
     sizes = [20]*len(long)
     color = [10]*len(long)
+    z_order = [1]*len(long)
     while True:
-        index +=1
-        # direction = input('L or R : ').lower()    
-        # if(direction == 'l'):
-        #     if index != 0:
-        #         index -= 1
-        # elif(direction == 'r'):
-        #     if index != len(npzfile['arr_1']):
-        #         index += 1
-
-        # plt.subplot(2,1,1)
-        sizes[index] = 90
-        color[index] = 7
-        ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+        if(startUp == 0):
+            z_order[index] = 2
+            color[index] = 7
+            sizes[index] = 90
+            ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+            startUp += 1
+        # ax2.scatter(long,lat,zorder = z_order, c = color,s=sizes, cmap=plt.cm.jet)
 
         
         # plt.subplot(2,1,2)
         data = npzfile['arr_1'][index]
-        plot.set_array((np.asarray(data).reshape(width, height).T))
+        plot.set_array(np.asarray(data).reshape(height, width))
         fig.canvas.draw()
         fig.canvas.flush_events()
         plt.show()
-        # time.sleep(.04)
+        direction = input('L or R : ').lower()    
+        if(direction == 'l'):
+            if index != 0:
+                index -= 1
+
+                z_order[index + 1] = 1
+                color[index + 1] = 10
+                sizes[index + 1] = 20
+                print(z_order[index + 1])
+                print(color[index + 1])
+                print(sizes[index + 1])
+
+                
+
+        elif(direction == 'r'):
+            if index != len(npzfile['arr_1']):
+                index += 1
+                z_order[index -1] = 1
+                color[index - 1] = 10
+                sizes[index - 1] = 20
+        z_order[index] = 2
+        color[index] = 7
+        sizes[index] = 90
+        ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+
+        # plt.subplot(2,1,1)
+        # sizes[index] = 90
+        # color[index] = 7
+        # z_order[index] = 2
+
+        # for i in range(len(z_order)):
+        #     if i == index:
+        #         z_order[i] = 2
+        #         color[i] = 7
+        #         sizes[i] = 90
+        #         print("entered")
+        #     else:
+        #         z_order[i] = 1
+        #         color[i] = 10
+        #         sizes[i] = 20
+                
+
+        # time.sleep(.01)
 
 
 
