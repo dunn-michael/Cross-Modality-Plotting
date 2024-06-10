@@ -103,7 +103,7 @@ def main():
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
     print(len(npzfile['arr_1']))
-    index = 1000
+    index = 0
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
     print(data[1])
@@ -162,40 +162,37 @@ def main():
             color[index] = 7
             sizes[index] = 90
             ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+            plot.set_array(np.asarray(data).reshape(height, width))
             startUp += 1
         # ax2.scatter(long,lat,zorder = z_order, c = color,s=sizes, cmap=plt.cm.jet)
 
         
         # plt.subplot(2,1,2)
         data = npzfile['arr_1'][index]
-        plot.set_array(np.asarray(data).reshape(height, width))
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-        plt.show()
         direction = input('L or R : ').lower()    
         if(direction == 'l'):
             if index != 0:
+                z_order[index] = 1
+                color[index] = 10
+                sizes[index] = 20
                 index -= 1
-
-                z_order[index + 1] = 1
-                color[index + 1] = 10
-                sizes[index + 1] = 20
-                print(z_order[index + 1])
-                print(color[index + 1])
-                print(sizes[index + 1])
 
                 
 
         elif(direction == 'r'):
             if index != len(npzfile['arr_1']):
+                z_order[index] = 1
+                color[index] = 10
+                sizes[index] = 20
                 index += 1
-                z_order[index -1] = 1
-                color[index - 1] = 10
-                sizes[index - 1] = 20
         z_order[index] = 2
         color[index] = 7
         sizes[index] = 90
+        plot.set_array(np.asarray(data).reshape(height, width))
         ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+        plt.show()
 
         # plt.subplot(2,1,1)
         # sizes[index] = 90
