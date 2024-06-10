@@ -19,7 +19,7 @@ imgData = []
 plot = None
 partNumber = []
 mode = []
-
+closest_index =0 
 
 j = 0
 
@@ -119,59 +119,34 @@ def on_press(key):
     elif key == Key.left:
         switch = 2
         return False
-    
-# def on_pick(event):
-#     artist = event.artist
-#     xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
-#     x, y = artist.get_xdata(), artist.get_ydata()
-#     ind = event.ind
-#     print 'Artist picked:', event.artist
-#     print '{} vertices picked'.format(len(ind))
-#     print 'Pick between vertices {} and {}'.format(min(ind), max(ind)+1)
-#     print 'x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse)
-#     print 'Data point:', x[ind[0]], y[ind[0]]
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Sample data (longitude, latitude)
-x = np.array([-74.006, -118.2437, -0.1276, 151.2093, 139.6917])  # Example longitudes
-y = np.array([40.7128, 34.0522, 51.5074, -33.8688, 35.6895])  # Example latitudes
-labels = ['New York', 'Los Angeles', 'London', 'Sydney', 'Tokyo']  # Example labels for each point
-
-# Convert degrees to radians
 def deg2rad(deg):
     return deg * (np.pi / 180)
 
-# Haversine formula to calculate distance between two points on the Earth
 def haversine(lon1, lat1, lon2, lat2):
-    # Radius of the Earth in kilometers
     R = 6371.0
     
-    # Convert coordinates from degrees to radians
     lon1, lat1, lon2, lat2 = map(deg2rad, [lon1, lat1, lon2, lat2])
     
-    # Differences
     dlon = lon2 - lon1
     dlat = lat2 - lat1
     
-    # Haversine formula
     a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
     
-    # Distance
+
     distance = R * c
     return distance
 
 # Create a scatter plot
-fig, ax = plt.subplots()
-scatter = ax.scatter(x, y)
+# fig, ax = plt.subplots()
+# scatter = ax.scatter(x, y)
 
 # Function to be called when a point is clicked
 def on_click(event):
+    global closest_index
     # Check if the click event is on the scatter plot
-    if event.inaxes == ax:
+    if event.inaxes == ax2:
         # Get the click coordinates
         click_x, click_y = event.xdata, event.ydata
 
@@ -203,53 +178,12 @@ def on_click(event):
         closest_index = int(closest_index)
         
         print(f"Closest index: {closest_index}")
-
-        closest_x = x[closest_index]
-        closest_y = y[closest_index]
-        closest_label = labels[closest_index]
+        closest_x = long[closest_index]
+        closest_y = lati[closest_index]
+        # closest_label = labels[closest_index]
 
         # Print the information about the clicked point
-        print(f"Clicked on point: (longitude={closest_x}, latitude={closest_y}, label={closest_label})")
-
-
-
-
-
-# def deg2rad(deg):
-    # return deg * (np.pi / 180)
-# def haver(lon1, lat1, lon2, lat2):
-    # R = 6371.0
-    # lon1, lat1, lon2, lat2 = map(deg2rad, [lon1,lat1,lon2,lat2])
-    # dlon = lon2 - lon1
-    # dlat = lat2-lat2
-
-    # a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
-    # c = 2 * np.arctan2(np.sqrt(a),np.sqrt(1-a))
-
-    # distance = R*c
-    # return distance
-
-# def on_click(event):
-    # if event.inaxes == ax2:
-    #     click_x, click_y = event.xdata, event.ydata
-
-    #     print(f"Click Coordinates ({click_x}, {click_y})")
-
-    #     if click_x is None or click_y is None:
-    #         print("Click coordinates are invalid, skipping")
-    #         return
-
-    #     # distances = ((x-click_x)**2 + (y-click_y)**2)**0.5
-    #     distances = np.array([haver(click_x,click_y,lon,lat) for lon,lat in zip(long, lati)])
-    #     print(distances)
-    #     if len(distances) == 0:
-    #         print("Distances is empty, skip")
-    #         return
-    #     # closest_index = distances.argmin(distances)
-    #     closest_index = np.argmin(distances)
-    #     closest_index = distances.argmin(distances)
-    #     closest_x, closest_y = x[closest_index], y[closest_index]
-    #     print(f'Clicked on point: ({closest_x}, {closest_y})')
+        print(f"Clicked on point: (longitude={closest_x}, latitude={closest_y})")
 
 
 def main():
@@ -315,6 +249,11 @@ def main():
     z_order = [1]*len(long)
 
     while True:
+        if index != closest_index:
+            z_order[index] = 1
+            color[index] = 10
+            sizes[index] = 20
+        index = closest_index
         # If esc is pressed
         if quitGraph:
             break
