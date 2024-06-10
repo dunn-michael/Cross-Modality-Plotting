@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import time
 # import math
 # import keyboard
-import pynput
+from pynput.keyboard import Key, Listener
 
 lat = []
 long = []
@@ -97,17 +97,33 @@ def update_mode(mode, part_num):
             exit()
 
 
+def on_release(key):
+    global switch
+    # global quitGraph
+    print('{0} release'.format(
+        key))
+    if key == Key.right:
+        switch = 1
+        return False
+    
+    elif key == Key.left:
+        switch = 2
+        return False
+    # elif key == Key.esc:
+        # quitGraph = True
 def main():
-
+    global switch
+    # global quitGraph
+    # quitGraph = False
     startUp = 0
 
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
-    print(len(npzfile['arr_1']))
+    # print(len(npzfile['arr_1']))
     index = 0
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
-    print(data[1])
+    # print(data[1])
     height = npzfile['arr_3'][index]
     width = npzfile['arr_2'][index]
     partNumber = npzfile['arr_4'][index]
@@ -159,33 +175,49 @@ def main():
     z_order = [1]*len(long)
     while True:
         if(startUp == 0):
+            print("entered")
             z_order[index] = 2
             color[index] = 7
             sizes[index] = 90
             ax2.scatter(long,lat, c = color,s=sizes, cmap=plt.cm.jet)
             plot.set_array(np.asarray(data).reshape(height, width))
+            fig.canvas.draw()
+            fig.canvas.flush_events()
+            plt.show()
+            print("graphed")
             startUp += 1
+
+        with Listener(
+            # on_press=on_press,
+            on_release=on_release) as listener:
+                listener.join()
+        # if quitGraph:
+            # quit
         # ax2.scatter(long,lat,zorder = z_order, c = color,s=sizes, cmap=plt.cm.jet)
 
         
         # plt.subplot(2,1,2)
         data = npzfile['arr_1'][index]
-        direction = input('L or R : ').lower()    
-        if(direction == 'l'):
+        # direction = input('L or R : ').lower()    
+        # if(direction == 'l'):
+        if switch == 2:
             if index != 0:
                 z_order[index] = 1
                 color[index] = 10
                 sizes[index] = 20
                 index -= 1
+                switch = 0
 
                 
 
-        elif(direction == 'r'):
+        # elif(direction == 'r'):
+        elif switch == 1:
             if index != len(npzfile['arr_1']):
                 z_order[index] = 1
                 color[index] = 10
                 sizes[index] = 20
                 index += 1
+                switch = 0
         z_order[index] = 2
         color[index] = 7
         sizes[index] = 90
