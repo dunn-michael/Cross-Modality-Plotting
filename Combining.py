@@ -7,6 +7,7 @@ from pynput.keyboard import Key, Listener
 
 lat = []
 long = []
+lati = []
 timestamp = []
 heading= []
 x=[]
@@ -129,25 +130,47 @@ def on_press(key):
 #     print 'Pick between vertices {} and {}'.format(min(ind), max(ind)+1)
 #     print 'x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse)
 #     print 'Data point:', x[ind[0]], y[ind[0]]
+def deg2rad(deg):
+    return deg * (np.pi / 180)
+def haver(lon1, lat1, lon2, lat2):
+    R = 6371.0
+    lon1, lat1, lon2, lat2 = map(deg2rad, [lon1,lat1,lon2,lat2])
+    dlon = lon2 - lon1
+    dlat = lat2-lat2
 
+    a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a),np.sqrt(1-a))
 
-def on_pick(event):
-    artist = event.artist
-    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
-    x, y = artist.get_xdata(), artist.get_ydata()
-    ind = event.ind
-    # print 'Artist picked:', event.artist
-    # print '{} vertices picked'.format(len(ind))
-    # print 'Pick between vertices {} and {}'.format(min(ind), max(ind)+1)
-    print('x, y of mouse: {:.2f},{:.2f}'.format(xmouse, ymouse))
-    # print 'Data point:', x[ind[0]], y[ind[0]]
-    # print
+    distance = R*c
+    return distance
 
+def on_click(event):
+    if event.inaxes == ax2:
+        click_x, click_y = event.xdata, event.ydata
+
+        print(f"Click Coordinates ({click_x}, {click_y})")
+
+        if click_x is None or click_y is None:
+            print("Click coordinates are invalid, skipping")
+            return
+
+        # distances = ((x-click_x)**2 + (y-click_y)**2)**0.5
+        distances = np.array([haver(click_x,click_y,lon,lat) for lon,lat in zip(long, lati)])
+        print(distances)
+        if len(distances) == 0:
+            print("Distances is empty, skip")
+            return
+        # closest_index = distances.argmin(distances)
+        closest_index = np.argmin(distances)
+        closest_index = distances.argmin(distances)
+        closest_x, closest_y = x[closest_index], y[closest_index]
+        print(f'Clicked on point: ({closest_x}, {closest_y})')
 
 
 def main():
     global switch
     global quitGraph
+    global ax2
     quitGraph = False
     startUp = 0
     switch = 0
@@ -173,6 +196,7 @@ def main():
                 # print(i,j)
                 found = True
                 lat.append(courseInfo[j][0])
+                lati.append(courseInfo[j][0])
                 long.append(courseInfo[j][1])
                 # location.append([courseInfo[j][1], courseInfo[j][0]])
                 timestamp.append(courseInfo[j][2])
@@ -265,7 +289,8 @@ def main():
         tolerance = 10 # points
         # ax.plot(range(10), 'ro-', picker=tolerance)
 
-        fig.canvas.callbacks.connect('pick_event', on_pick)
+        # fig.canvas.callbacks.connect('pick_event', on_pick)
+        fig.canvas.mpl_connect('button_press_event', on_click)
 
         z_order[index] = 2
         color[index] = 7
