@@ -152,8 +152,6 @@ def main():
     fig.canvas.flush_events()
     while True:
         index +=1
-        print(index)
-        plt.ion()
         # direction = input('L or R : ').lower()    
         # if(direction == 'l'):
         #     if index != 0:
