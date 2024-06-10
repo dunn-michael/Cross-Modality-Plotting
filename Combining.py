@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time
 # import math
 # import keyboard
+import pynput
 
 lat = []
 long = []
