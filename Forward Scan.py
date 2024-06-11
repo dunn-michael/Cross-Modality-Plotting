@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-# import math
 
 selected_index = None
 lat = []
 long = []
-lati = []
 timestamp = []
 heading= []
 x=[]
@@ -137,7 +134,7 @@ def on_click(event):
             return
 
 
-        distances = np.array([haversine(click_x, click_y, lon, lat) for lon, lat in zip(long, lati)])
+        distances = np.array([haversine(click_x, click_y, lon, lati) for lon, lati in zip(long, lat)])
 
 
         print(f"Distances: {distances}")
@@ -157,7 +154,7 @@ def on_click(event):
         
         print(f"Closest index: {selected_index}")
         closest_x = long[selected_index]
-        closest_y = lati[selected_index]
+        closest_y = lat[selected_index]
 
         print(f"Clicked on point: (longitude={closest_x}, latitude={closest_y})")
         update_highlight()
@@ -180,13 +177,10 @@ def on_key(event):
     update_highlight()
 
 def main():
-    global switch
     global quitGraph
     global ax2
     global highlight
     global fig
-    startUp = 0
-    switch = 0
     # Load the data into the program and intiliaze
     # it into lists
     courseInfo = np.load('course-info.npy')
@@ -206,12 +200,9 @@ def main():
         found = False
         while not found:
             if int(courseInfo[j][2]) >= int(npzfile['arr_0'][i]):
-                # print(i,j)
                 found = True
                 lat.append(courseInfo[j][0])
-                lati.append(courseInfo[j][0])
                 long.append(courseInfo[j][1])
-                # location.append([courseInfo[j][1], courseInfo[j][0]])
                 timestamp.append(courseInfo[j][2])
                 heading.append(courseInfo[j][3])
             if j < len(courseInfo) - 1:
@@ -254,6 +245,7 @@ def main():
         fig.canvas.draw_idle()
         fig.canvas.flush_events()
         plt.show()
-
+        if not plt.fignum_exists(1):
+            quitGraph = True
 
 main()
