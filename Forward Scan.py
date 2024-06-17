@@ -299,9 +299,10 @@ def main():
 
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
 
+    print(len(sidescan_images))
+
     for img_path, tfw_path in zip(sidescan_images, tfw_files):
         try:
-            # print("entered")
             x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
             ds = gdal.Open(img_path)
 
@@ -313,26 +314,30 @@ def main():
             # lat.append(y_coord)
             ax2.imshow(img, extent=img_extent,origin='upper')
 
+
             ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
             ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
-
+            plt.draw()
 
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
     # while not quitGraph:
 
-        index = selected_index
+    index = selected_index
+    data = npzfile['arr_1'][index]
+            
+    fig.canvas.mpl_connect('button_press_event', on_click)
+    fig.canvas.mpl_connect('key_press_event', on_key)
+    # im = plt.imread("image.Tiff")
+    plot.set_array(np.asarray(data).reshape(height, width))
+    while not quitGraph:
+        ax2.scatter(long,lat, color='blue')
+        fig.canvas.draw_idle()
+        fig.canvas.flush_events()
 
-        data = npzfile['arr_1'][index]
-                
-        fig.canvas.mpl_connect('button_press_event', on_click)
-        fig.canvas.mpl_connect('key_press_event', on_key)
-        # im = plt.imread("image.Tiff")
-        plot.set_array(np.asarray(data).reshape(height, width))
-        while not quitGraph:
-            ax2.scatter(long,lat, color='blue')
-            plt.show()
+        plt.show()
+
 
         # fig.canvas.mpl_connect('button_press_event', on_click)
         # fig.canvas.mpl_connect('key_press_event', on_key)
@@ -342,8 +347,8 @@ def main():
         # fig.canvas.draw_idle()
         # fig.canvas.flush_events()
         # plt.show()
-            if not plt.fignum_exists(1):
-                plt.close()
-                quitGraph = True
+        if not plt.fignum_exists(1):
+            plt.close()
+            quitGraph = True
 
 main()
