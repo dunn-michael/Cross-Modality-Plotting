@@ -179,39 +179,6 @@ def on_key(event):
 
     update_highlight()
 
-def read_tfw(tfw_path):
-    with open(tfw_path, 'r') as f:
-        lines = f.readlines()
-        x_pixel_length = float(lines[0].strip())
-        x_rot_angle = float(lines[1].strip())
-        y_rot_angle = float(lines[2].strip())
-        neg_y_pixel_length = float(lines[3].strip())
-        x_coord = float(lines[4].strip())
-        y_coord = float(lines[5].strip())
-        print(x_coord, y_coord)
-        return x_pixel_length, neg_y_pixel_length, x_coord, y_coord
-
-def read_tiff_image(img_path):
-    try:
-        ds = gdal.Open(img_path)
-        img = ds.ReadAsArray()
-
-        if img.ndim == 3:
-            img = img[0]
-
-        return img
-
-    except Exception as e:
-        print(f"Error reading TIFF image {img_path}: {e}")
-        raise
-
-def scale_extent(extent, scale_factor):
-    x_center = (extent[0] + extent[1]) / 2
-    y_center = (extent[2] + extent[3]) / 2
-    width = (extent[1] - extent[0]) * scale_factor
-    height = (extent[3] - extent[2]) * scale_factor
-    return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
-
 def main():
     global quitGraph
     global ax2
@@ -272,30 +239,6 @@ def main():
 
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
 
-    scale_factor = 0.5
-
-    min_long = min(long)
-    max_long = max(long)
-    min_lat = min(lat)
-    max_lat = max(lat)
-
-    for img_path, tfw_path in zip(sidescan_images, tfw_files):
-        try:
-            x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
-            ds = gdal.Open(img_path)
-
-            img = read_tiff_image(img_path)
-            
-            img_width = ds.RasterXSize * x_pixel_length
-            img_height = ds.RasterYSize * abs(neg_y_pixel_length)
-
-            img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-            scaled_extent =  scale_extent(img_extent, scale_factor)
-            ax2.imshow(img, extent=scaled_extent, origin='upper')
-            ax2.set_xlim(min_long,max_long)
-            ax2.set_ylim(min_lat,max_lat)
-        except Exception as e:
-            print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
     while not quitGraph:
 
         index = selected_index
@@ -304,7 +247,7 @@ def main():
                 
         fig.canvas.mpl_connect('button_press_event', on_click)
         fig.canvas.mpl_connect('key_press_event', on_key)
-        im = plt.imread("image.Tiff")
+        # im = plt.imread("image.Tiff")
         plot.set_array(np.asarray(data).reshape(height, width))
         ax2.scatter(long,lat, color='blue')
         fig.canvas.draw_idle()
