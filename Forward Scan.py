@@ -221,6 +221,7 @@ def on_key(event):
     elif event.key == 'left' or event.key == 'down':
         selected_index = (selected_index - 1) % len(long)
     elif event.key == 'escape':
+        plt.close()
         quitGraph = True
 
 
@@ -300,6 +301,7 @@ def main():
 
     for img_path, tfw_path in zip(sidescan_images, tfw_files):
         try:
+            # print("entered")
             x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
             ds = gdal.Open(img_path)
 
@@ -328,9 +330,9 @@ def main():
         fig.canvas.mpl_connect('key_press_event', on_key)
         # im = plt.imread("image.Tiff")
         plot.set_array(np.asarray(data).reshape(height, width))
-        ax2.scatter(long,lat, color='blue')
-
-        plt.show()
+        while not quitGraph:
+            ax2.scatter(long,lat, color='blue')
+            plt.show()
 
         # fig.canvas.mpl_connect('button_press_event', on_click)
         # fig.canvas.mpl_connect('key_press_event', on_key)
@@ -340,7 +342,8 @@ def main():
         # fig.canvas.draw_idle()
         # fig.canvas.flush_events()
         # plt.show()
-        # if not plt.fignum_exists(1):
-        #     quitGraph = True
+            if not plt.fignum_exists(1):
+                plt.close()
+                quitGraph = True
 
 main()
