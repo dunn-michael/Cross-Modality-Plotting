@@ -8,7 +8,6 @@ from osgeo import gdal
 import cv2
 from PIL import Image
 
-selected_index = None
 lat = []
 long = []
 timestamp = []
@@ -26,6 +25,8 @@ j = 0
 highlight_patch = None
 
 def meters_to_degrees(meters):
+    """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
+
     meters_per_degree_lat = 111320
     meters_per_degree_long = 111320
 
@@ -35,21 +36,23 @@ def meters_to_degrees(meters):
     return degrees_lat,degrees_long
 
 def create_sector_path(radius_lat, radius_long, thetamin=np.radians(65), thetamax=np.radians(-65), num_points=100):
+    """Creates the shape of the sonar outline on the path graph"""
+
     theta = np.linspace(thetamin, thetamax, num_points)
     x = radius_long * np.cos(theta)
     y = radius_lat * np.sin(theta)
     
-    # Vertices for the sector
     vertices = np.vstack((x, y)).T
-    # Add the center point and the starting point to close the sector
+
     vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
     
-    # Codes for the path
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
     
     return vertices, codes
 
 def read_tfw(tfw_path):
+    """Reads the TFW files"""
+
     with open(tfw_path, 'r') as f:
         lines = f.readlines()
         x_pixel_length = float(lines[0])
@@ -61,6 +64,7 @@ def read_tfw(tfw_path):
         return x_pixel_length, neg_y_pixel_length, x_coord, y_coord
 
 def read_tiff_image(img_path):
+    """Read TIFF image so you can graph the path"""
     try:
         img = Image.open(img_path)
         img.apply_transparency()
@@ -72,15 +76,8 @@ def read_tiff_image(img_path):
         print(f"Error reading TIFF image {img_path}: {e}")
         raise
 
-# def scale_extent(extent, scale_factor):
-#     x_center = (extent[0] + extent[1]) / 2
-#     y_center = (extent[2] + extent[3]) / 2
-#     width = (extent[1] - extent[0]) * scale_factor
-#     height = (extent[3] - extent[2]) * scale_factor
-#     return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
-
 def update_mode(mode, part_num):
-
+    """Updates the mode so that we can get proper range and aperture data"""
     global frequency
     global range_max
     global range_min
@@ -152,6 +149,8 @@ def update_mode(mode, part_num):
             exit()
 
 def update_highlight():
+    """Draws the red sonar outline on the sidescan images"""
+
     global highlight_patch
     radius_lat, radius_long = meters_to_degrees(range_max)
     vertices, codes = create_sector_path(radius_lat, radius_long)
@@ -165,9 +164,9 @@ def update_highlight():
     rad_heading = deg2rad(heading[selected_index])
     ax.set_theta_offset(rad_heading)
     ax2.add_patch(highlight_patch)
-    fig.canvas.draw_idle()
 
 def deg2rad(deg):
+    """Converts degrees to radians"""
     return deg * (np.pi / 180)
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -186,6 +185,10 @@ def haversine(lon1, lat1, lon2, lat2):
     return distance
 
 def on_click(event):
+    """Gets called when you click on the sidescan data graph
+    Changes the selected index and updates the highlight so that
+    the proper area is highlighted on the graph"""
+
     global selected_index
     global data
     global npzfile
@@ -233,6 +236,10 @@ def on_click(event):
         fig.canvas.flush_events()
 
 def on_key(event):
+    """Gets called when you use the arrow keys,
+    Changes the selected index and updates the highlight so that
+    the proper area is highlighted on the graph"""
+
     global quitGraph
     global selected_index
     if selected_index is None:
@@ -288,7 +295,6 @@ def main():
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
     j = 0
-    location = []
     # This is for only getting the timestamps that have graphs accociated.
     # This way we aren't generating thousand of other points on the scatterplot
     for i in range(len(npzfile['arr_0'])):
@@ -308,7 +314,6 @@ def main():
     # The file could have different modes in it, this will update the size of the graph if the mode is different
     update_mode(mode, partNumber)
     # Functions that setup the polar and cartesian graphs
-    # plt.ion()
     fig = plt.figure()
     ax2 = fig.add_subplot(121)
     ax = fig.add_subplot(122,projection='polar')
@@ -351,15 +356,8 @@ def main():
     fig.canvas.mpl_connect('button_press_event', on_click)
     fig.canvas.mpl_connect('key_press_event', on_key)
     plot.set_array(np.asarray(data).reshape(height, width))
-    print("Graphing")
-    rad_heading = deg2rad(heading[selected_index])
     update_highlight()
     plt.show()
-
-    while not quitGraph:
-        if not plt.fignum_exists(1):
-            plt.close()
-            quitGraph = True
 
 if __name__ == "__main__":
     main()
