@@ -28,6 +28,8 @@ selected_index =0
 quitGraph = False
 j = 0
 
+highlight_patch = None
+
 def meters_to_degrees(meters):
     meters_per_degree_lat = 111320
     meters_per_degree_long = 111320
