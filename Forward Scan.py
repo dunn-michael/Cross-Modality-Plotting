@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
+from matplotlib.transforms import Affine2D
 from osgeo import gdal
 import cv2
 from PIL import Image
@@ -26,11 +29,6 @@ quitGraph = False
 j = 0
 
 # NOTE: EVERYTHING BELOW THIS IS TESTING
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.path import Path
-from matplotlib.patches import PathPatch
-from matplotlib.transforms import Affine2D
 
 # Function to create the sector path with rotation
 def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
@@ -47,35 +45,6 @@ def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
     
     return vertices, codes
-
-# Generate some data
-np.random.seed(0)
-x = np.random.rand(20)
-y = np.random.rand(20)
-
-# Create the base sector vertices and codes
-vertices, codes = create_sector_path()
-
-# Highlight specific points with different rotation angles
-highlighted_indices = [2, 5, 8]  # Example indices to highlight
-rotation_angles = [45, 90, 135]  # Example rotation angles for each point in degrees
-
-# Create a scatter plot
-fig, ax = plt.subplots()
-ax.scatter(x, y)
-
-# Loop through each highlighted point and plot it with the respective rotation
-for index, angle in zip(highlighted_indices, rotation_angles):
-    rotation_transform = Affine2D().rotate_deg(angle)
-    rotated_vertices = rotation_transform.transform(vertices)
-    path = Path(rotated_vertices, codes)
-    patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
-    ax.scatter(x[index], y[index], s=500, facecolor='none', edgecolor='r', marker=path)
-
-# Set the same aspect ratio
-ax.set_aspect('equal')
-
-plt.show()
 
 # NOTE: EVERYTHING ABOVE THIS IS TESTING
 
@@ -191,12 +160,21 @@ def update_mode(mode, part_num):
             exit()
 
 def update_highlight():
-    if selected_index is not None:
-        highlight.set_data(long[selected_index], lat[selected_index])
-    else:
-        print(f"SELECTED{selected_index}")
-        highlight.set_data([], [])
-    fig.canvas.draw()
+    vertices, codes = create_sector_path()
+    # for index, angle in zip(selected_index, heading):
+    rotation_transform = Affine2D().rotate_deg(heading[selected_index])
+    rotated_vertices = rotation_transform.transform(vertices)
+    path = Path(rotated_vertices, codes)
+    patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
+    ax2.scatter(long[selected_index], lat[selected_index], s=500, facecolor='none', edgecolor='r', marker=path)
+
+
+    # if selected_index is not None:
+    #     highlight.set_data(long[selected_index], lat[selected_index])
+    # else:
+    #     print(f"SELECTED{selected_index}")
+    #     highlight.set_data([], [])
+    # fig.canvas.draw()
 
 def deg2rad(deg):
     return deg * (np.pi / 180)
@@ -263,6 +241,8 @@ def on_click(event):
         # print(type(selected_index))
         # print(np.asarray(data).reshape(height, width))
         plot.set_array(np.asarray(data).reshape(height, width))
+        fig.canvas.draw_idle()
+        fig.canvas.flush_events()
 
 def on_key(event):
     global quitGraph
@@ -282,6 +262,8 @@ def on_key(event):
     update_highlight()
     data = npzfile['arr_1'][selected_index]
     plot.set_array(np.asarray(data).reshape(height, width))
+    fig.canvas.draw_idle()
+    fig.canvas.flush_events()
 
 def main():
     global quitGraph
@@ -296,6 +278,7 @@ def main():
 
     sidescan_images = []
     tfw_files = []
+    highlighted_index = []
     # NOTE:
     # 33 - 56 is the full range for this set of data, it may change with other data sets
     # for i in range(33, 56):
@@ -335,7 +318,6 @@ def main():
 
     # The file could have different modes in it, this will update the size of the graph if the mode is different
     update_mode(mode, partNumber)
-
     # Functions that setup the polar and cartesian graphs
     # plt.ion()
     fig = plt.figure()
@@ -353,7 +335,6 @@ def main():
 
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
 
-    print(len(sidescan_images))
 
     for img_path, tfw_path in zip(sidescan_images, tfw_files):
         try:
@@ -379,10 +360,24 @@ def main():
     index = selected_index
     data = npzfile['arr_1'][index]
             
+    # NOTE
+# # Highlight specific points with different rotation angles
+# Create a scatter plot
+    for i in range(len(long)):
+        highlighted_index.append(i)
+    # Loop through each highlighted point and plot it with the respective rotation
+
+    # Set the same aspect ratio
+    # ax.set_aspect('equal')
+
+    # NOTE
+
     fig.canvas.mpl_connect('button_press_event', on_click)
     fig.canvas.mpl_connect('key_press_event', on_key)
     # im = plt.imread("image.Tiff")
     plot.set_array(np.asarray(data).reshape(height, width))
+    print("Graphing")
+    plt.show()
     while not quitGraph:
         # for img_path, tfw_path in zip(sidescan_images, tfw_files):
         #     try:
@@ -405,10 +400,10 @@ def main():
             #     print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
             
         # ax2.scatter(long,lat, color='blue')
-        fig.canvas.draw_idle()
-        fig.canvas.flush_events()
+        # fig.canvas.draw_idle()
+        # fig.canvas.flush_events()
 
-        plt.show()
+        # plt.show()
 
 
         # fig.canvas.mpl_connect('button_press_event', on_click)
