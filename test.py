@@ -1,94 +1,50 @@
-import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from osgeo import gdal
-from scipy.ndimage import zoom
-import cv2
-from PIL import Image
+import numpy as np
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
+from matplotlib.transforms import Affine2D
 
-quitGraph = False
+# Function to create the sector path with rotation
+def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
+    theta = np.linspace(thetamin, thetamax, num_points)
+    x = radius * np.cos(theta)
+    y = radius * np.sin(theta)
+    
+    # Vertices for the sector
+    vertices = np.vstack((x, y)).T
+    # Add the center point and the starting point to close the sector
+    vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
+    
+    # Codes for the path
+    codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
+    
+    return vertices, codes
 
-def read_tfw(tfw_path):
-    with open(tfw_path, 'r') as f:
-        lines = f.readlines()
-        x_pixel_length = float(lines[0])
-        x_rot_angle = float(lines[1])
-        y_rot_angle = float(lines[2])
-        neg_y_pixel_length = float(lines[3])
-        x_coord = float(lines[4])
-        y_coord = float(lines[5])
-        # print(x_coord, y_coord)
-        return x_pixel_length, neg_y_pixel_length, x_coord, y_coord
+# Generate some data
+np.random.seed(0)
+x = np.random.rand(20)
+y = np.random.rand(20)
 
-def read_tiff_image(img_path):
-    try:
-        img = Image.open(img_path)
-        img.apply_transparency()
-        img_data = np.array(img)
-        
-        return img_data
+# Create the base sector vertices and codes
+vertices, codes = create_sector_path()
 
-    except Exception as e:
-        print(f"Error reading TIFF image {img_path}: {e}")
-        raise
+# Highlight specific points with different rotation angles
+highlighted_indices = [2, 5, 8]  # Example indices to highlight
+rotation_angles = [45, 90, 135]  # Example rotation angles for each point in degrees
 
-def scale_extent(extent, scale_factor):
-    x_center = (extent[0] + extent[1]) / 2
-    y_center = (extent[2] + extent[3]) / 2
-    width = (extent[1] - extent[0]) * scale_factor
-    height = (extent[3] - extent[2]) * scale_factor
-    return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
+# Create a scatter plot
+fig, ax = plt.subplots()
+ax.scatter(x, y)
 
-def remove_img_background(img_path):
-    bgcolor = [84,1,68]
-    img = cv2.imread(img_path)
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2BGRA)
+# Loop through each highlighted point and plot it with the respective rotation
+for index, angle in zip(highlighted_indices, rotation_angles):
+    rotation_transform = Affine2D().rotate_deg(angle)
+    rotated_vertices = rotation_transform.transform(vertices)
+    path = Path(rotated_vertices, codes)
+    patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
+    ax.scatter(x[index], y[index], s=500, facecolor='none', edgecolor='r', marker=path)
 
-    img[np.all(img == bgcolor + [255], axis =2)] = [0,0,0,0]
-    return img
+# Set the same aspect ratio
+ax.set_aspect('equal')
 
-def main():
-    long = []
-    lat = []
-
-    global quitGraph
-    global ax2
-    global highlight
-    global fig
-    sidescan_images = []
-    tfw_files = []
-    # for i in range(33, 56):
-    for i in range(33, 40):
-        sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
-        tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
-    # Functions that setup the polar and cartesian graphs
-    fig = plt.figure()
-    ax2 = fig.add_subplot()
-
-
-    scale = 1
-
-    for img_path, tfw_path in zip(sidescan_images, tfw_files):
-        try:
-            x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
-            ds = gdal.Open(img_path)
-
-            img = read_tiff_image(img_path)
-            img_width = ds.RasterXSize * x_pixel_length
-            img_height = ds.RasterYSize * abs(neg_y_pixel_length)
-            img_extent = [x_coord, x_coord + img_width / scale, y_coord - img_height / scale, y_coord]
-            long.append(x_coord)
-            lat.append(y_coord)
-            ax2.imshow(img, extent=img_extent,origin='upper')
-
-            ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
-            ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
-
-
-        except Exception as e:
-            print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
-    print(f"Min : ({min(long)}, {min(lat)})")
-    print(f"Max: ({max(long)}, {max(lat)})")
-    plt.show()
-
-main()
+plt.show()

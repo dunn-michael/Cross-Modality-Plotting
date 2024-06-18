@@ -25,6 +25,60 @@ selected_index =0
 quitGraph = False
 j = 0
 
+# NOTE: EVERYTHING BELOW THIS IS TESTING
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
+from matplotlib.transforms import Affine2D
+
+# Function to create the sector path with rotation
+def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
+    theta = np.linspace(thetamin, thetamax, num_points)
+    x = radius * np.cos(theta)
+    y = radius * np.sin(theta)
+    
+    # Vertices for the sector
+    vertices = np.vstack((x, y)).T
+    # Add the center point and the starting point to close the sector
+    vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
+    
+    # Codes for the path
+    codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
+    
+    return vertices, codes
+
+# Generate some data
+np.random.seed(0)
+x = np.random.rand(20)
+y = np.random.rand(20)
+
+# Create the base sector vertices and codes
+vertices, codes = create_sector_path()
+
+# Highlight specific points with different rotation angles
+highlighted_indices = [2, 5, 8]  # Example indices to highlight
+rotation_angles = [45, 90, 135]  # Example rotation angles for each point in degrees
+
+# Create a scatter plot
+fig, ax = plt.subplots()
+ax.scatter(x, y)
+
+# Loop through each highlighted point and plot it with the respective rotation
+for index, angle in zip(highlighted_indices, rotation_angles):
+    rotation_transform = Affine2D().rotate_deg(angle)
+    rotated_vertices = rotation_transform.transform(vertices)
+    path = Path(rotated_vertices, codes)
+    patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
+    ax.scatter(x[index], y[index], s=500, facecolor='none', edgecolor='r', marker=path)
+
+# Set the same aspect ratio
+ax.set_aspect('equal')
+
+plt.show()
+
+# NOTE: EVERYTHING ABOVE THIS IS TESTING
+
 def read_tfw(tfw_path):
     with open(tfw_path, 'r') as f:
         lines = f.readlines()
@@ -313,17 +367,15 @@ def main():
             # long.append(x_coord)
             # lat.append(y_coord)
             ax2.imshow(img, extent=img_extent,origin='upper')
-
-
+            ax2.set_zorder(1)
             ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
             ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
-            plt.draw()
+            # plt.draw()
 
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
     # while not quitGraph:
-
     index = selected_index
     data = npzfile['arr_1'][index]
             
@@ -332,7 +384,27 @@ def main():
     # im = plt.imread("image.Tiff")
     plot.set_array(np.asarray(data).reshape(height, width))
     while not quitGraph:
-        ax2.scatter(long,lat, color='blue')
+        # for img_path, tfw_path in zip(sidescan_images, tfw_files):
+        #     try:
+        #         x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
+        #         ds = gdal.Open(img_path)
+
+        #         img = read_tiff_image(img_path)
+        #         img_width = ds.RasterXSize * x_pixel_length
+        #         img_height = ds.RasterYSize * abs(neg_y_pixel_length)
+        #         img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
+        #         # long.append(x_coord)
+        #         # lat.append(y_coord)
+        #         ax2.imshow(img, extent=img_extent,origin='upper')
+        #         ax2.set_zorder(1)
+        #         ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
+        #         ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
+                # plt.draw()
+
+            # except Exception as e:
+            #     print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
+            
+        # ax2.scatter(long,lat, color='blue')
         fig.canvas.draw_idle()
         fig.canvas.flush_events()
 
