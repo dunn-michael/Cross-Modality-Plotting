@@ -1,50 +1,87 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.path import Path
-from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D
+from matplotlib.patches import PathPatch
 
-# Function to create the sector path with rotation
-def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
+# Function to convert meters to degrees of latitude and longitude
+def meters_to_degrees(meters, latitude):
+    meters_per_degree_lat = 111320  # Approximate meters per degree latitude
+    meters_per_degree_lon = 111320 * np.cos(np.radians(latitude))  # Adjust for longitude based on latitude
+    degrees_lat = meters / meters_per_degree_lat
+    degrees_lon = meters / meters_per_degree_lon
+    return degrees_lat, degrees_lon
+
+# Function to create the sector path with given radius in degrees
+def create_sector_path(radius_lat, radius_lon, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
     theta = np.linspace(thetamin, thetamax, num_points)
-    x = radius * np.cos(theta)
-    y = radius * np.sin(theta)
-    
-    # Vertices for the sector
+    x = radius_lon * np.cos(theta)
+    y = radius_lat * np.sin(theta)
     vertices = np.vstack((x, y)).T
-    # Add the center point and the starting point to close the sector
     vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
-    
-    # Codes for the path
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
-    
     return vertices, codes
 
-# Generate some data
+# Generate some data (latitude and longitude)
 np.random.seed(0)
-x = np.random.rand(20)
-y = np.random.rand(20)
+latitudes = 40 + np.random.rand(20) * 0.1  # Around 40 degrees latitude
+longitudes = -74 + np.random.rand(20) * 0.1  # Around -74 degrees longitude
 
-# Create the base sector vertices and codes
-vertices, codes = create_sector_path()
+# Define the radius in meters
+radius_meters = 30
 
-# Highlight specific points with different rotation angles
-highlighted_indices = [2, 5, 8]  # Example indices to highlight
-rotation_angles = [45, 90, 135]  # Example rotation angles for each point in degrees
-
-# Create a scatter plot
+# Initialize the figure and axis
 fig, ax = plt.subplots()
-ax.scatter(x, y)
+scatter = ax.scatter(longitudes, latitudes)
 
-# Loop through each highlighted point and plot it with the respective rotation
-for index, angle in zip(highlighted_indices, rotation_angles):
-    rotation_transform = Affine2D().rotate_deg(angle)
+# To keep track of the currently highlighted point
+highlight_patch = None
+
+def onpick(event):
+    global highlight_patch
+    if event.artist != scatter:
+        return
+
+    # Remove the previous highlight
+    if highlight_patch:
+        highlight_patch.remove()
+        highlight_patch = None
+
+    ind = event.ind[0]
+    lat = latitudes[ind]
+    lon = longitudes[ind]
+
+    # Convert the radius to degrees based on the latitude of the point
+    radius_lat, radius_lon = meters_to_degrees(radius_meters, lat)
+
+    # Create the sector path with the converted radius
+    vertices, codes = create_sector_path(radius_lat, radius_lon)
+
+    # Rotate the path if needed (set rotation angle here)
+    rotation_angle = 0  # Set desired rotation angle
+    rotation_transform = Affine2D().rotate_deg(rotation_angle)
     rotated_vertices = rotation_transform.transform(vertices)
-    path = Path(rotated_vertices, codes)
-    patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
-    ax.scatter(x[index], y[index], s=500, facecolor='none', edgecolor='r', marker=path)
+
+    # Translate the path to the current point
+    translated_vertices = rotated_vertices + np.array([lon, lat])
+    path = Path(translated_vertices, codes)
+
+    # Create a patch and add it to the axis
+    highlight_patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
+    ax.add_patch(highlight_patch)
+
+    fig.canvas.draw()
+
+# Connect the pick event
+fig.canvas.mpl_connect('pick_event', onpick)
+
+# Enable picking on the scatter plot
+scatter.set_picker(True)
 
 # Set the same aspect ratio
 ax.set_aspect('equal')
 
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+plt.title('Interactive Highlighting of Points')
 plt.show()
