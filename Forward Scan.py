@@ -28,13 +28,20 @@ selected_index =0
 quitGraph = False
 j = 0
 
-# NOTE: EVERYTHING BELOW THIS IS TESTING
+def meters_to_degrees(meters):
+    meters_per_degree_lat = 111320
+    meters_per_degree_long = 111320
+
+    degrees_lat = meters / meters_per_degree_lat
+    degrees_long = meters / meters_per_degree_long
+
+    return degrees_lat,degrees_long
 
 # Function to create the sector path with rotation
-def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
+def create_sector_path(radius_lat, radius_long, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
     theta = np.linspace(thetamin, thetamax, num_points)
-    x = radius * np.cos(theta)
-    y = radius * np.sin(theta)
+    x = radius_long * np.cos(theta)
+    y = radius_lat * np.sin(theta)
     
     # Vertices for the sector
     vertices = np.vstack((x, y)).T
@@ -45,8 +52,6 @@ def create_sector_path(radius=1.0, thetamin=np.radians(35), thetamax=np.radians(
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
     
     return vertices, codes
-
-# NOTE: EVERYTHING ABOVE THIS IS TESTING
 
 def read_tfw(tfw_path):
     with open(tfw_path, 'r') as f:
@@ -160,7 +165,9 @@ def update_mode(mode, part_num):
             exit()
 
 def update_highlight():
-    vertices, codes = create_sector_path()
+    radius_lat, radius_long = meters_to_degrees(range_max)
+
+    vertices, codes = create_sector_path(radius_lat, radius_long)
     # for index, angle in zip(selected_index, heading):
     rotation_transform = Affine2D().rotate_deg(heading[selected_index])
     rotated_vertices = rotation_transform.transform(vertices)
