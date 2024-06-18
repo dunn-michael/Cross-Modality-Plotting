@@ -414,4 +414,5 @@ def main():
             plt.close()
             quitGraph = True
 
-main()
+if __name__ == "__main__":
+    main()
