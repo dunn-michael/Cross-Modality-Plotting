@@ -5,8 +5,8 @@ from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D
 from osgeo import gdal
-import cv2
 from PIL import Image
+from matplotlib.widgets import CheckButtons
 
 lat = []
 long = []
@@ -19,10 +19,11 @@ imgData = []
 plot = None
 partNumber = []
 mode = []
-selected_index =0 
+selected_index = 0
 quitGraph = False
 j = 0
 highlight_patch = None
+image_artists = []
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -260,6 +261,11 @@ def on_key(event):
     fig.canvas.draw_idle()
     fig.canvas.flush_events()
 
+def update_images(label):
+    index = int(label.split(' ')[-1])
+    image_artists[index].set_visible(not image_artists[index].get_visible())
+    plt.draw()
+
 def main():
     global quitGraph
     global ax
@@ -271,20 +277,17 @@ def main():
     global plot
     global height
     global width
+    global image_artists
 
     sidescan_images = []
     tfw_files = []
     highlighted_index = []
-    # NOTE:
-    # 33 - 56 is the full range for this set of data, it may change with other data sets
-    # for i in range(33, 56):
-    for i in range(33, 37):
+
+    # for i in range(33, 37):
+    for i in range(33, 56):
         sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
         tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
 
-
-    # Load the data into the program and intiliaze
-    # it into lists
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
     index = 0
@@ -295,8 +298,6 @@ def main():
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
     j = 0
-    # This is for only getting the timestamps that have graphs accociated.
-    # This way we aren't generating thousand of other points on the scatterplot
     for i in range(len(npzfile['arr_0'])):
         found = False
         while not found:
@@ -311,45 +312,46 @@ def main():
             else:
                 break
 
-    # The file could have different modes in it, this will update the size of the graph if the mode is different
     update_mode(mode, partNumber)
-    # Functions that setup the polar and cartesian graphs
     fig = plt.figure()
     ax2 = fig.add_subplot(121)
-    ax = fig.add_subplot(122,projection='polar')
-    ax.set_thetamin(-horizontal_aperture/2)
-    ax.set_thetamax(horizontal_aperture/2)
-    theta = np.linspace(-horizontal_aperture/2, horizontal_aperture/2, width)*np.pi/180
+    ax = fig.add_subplot(122, projection='polar')
+    ax.set_thetamin(-horizontal_aperture / 2)
+    ax.set_thetamax(horizontal_aperture / 2)
+    theta = np.linspace(-horizontal_aperture / 2, horizontal_aperture / 2, width) * np.pi / 180
     r = np.linspace(range_min, range_max, height)
     T, R = np.meshgrid(theta, r)
     z = np.zeros_like(T)
     plot = ax.pcolormesh(T, R, z, cmap='gray', shading='auto', vmin=0, vmax=100)
-    # ax.set_theta_zero_location("N")
     ax.set_ylim(range_min, range_max)
-
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
 
-
-    for img_path, tfw_path in zip(sidescan_images, tfw_files):
+    check_labels = []
+    for i, (img_path, tfw_path) in enumerate(zip(sidescan_images, tfw_files)):
         try:
             x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
             ds = gdal.Open(img_path)
-
             img = read_tiff_image(img_path)
             img_width = ds.RasterXSize * x_pixel_length
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-            ax2.imshow(img, extent=img_extent,origin='upper')
-            # ax2.set_zorder(1)
+            img_artist = ax2.imshow(img, extent=img_extent, origin='upper')
+            # img_artist = ax2.imshow(img, extent=img_extent, origin='upper', alpha=0.7)
             ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
             ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
 
+            image_artists.append(img_artist)
+            img_artist.set_visible(False)
+            check_labels.append(f'Image {i}')
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
+    rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
+    check = CheckButtons(rax, check_labels, [False] * len(check_labels))
+    check.on_clicked(update_images)
+
     index = selected_index
     data = npzfile['arr_1'][index]
-            
     for i in range(len(long)):
         highlighted_index.append(i)
 
