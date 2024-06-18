@@ -278,7 +278,11 @@ def main():
             img_width = ds.RasterXSize * x_pixel_length
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-            img_artist = ax2.imshow(img, extent=img_extent, origin='upper', alpha=0.7)
+            img_artist = ax2.imshow(img, extent=img_extent, origin='upper')
+            # img_artist = ax2.imshow(img, extent=img_extent, origin='upper', alpha=0.7)
+            ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
+            ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
+
             image_artists.append(img_artist)
             img_artist.set_visible(False)
             check_labels.append(f'Image {i}')

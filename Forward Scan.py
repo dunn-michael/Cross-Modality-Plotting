@@ -340,7 +340,7 @@ def main():
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
             ax2.imshow(img, extent=img_extent,origin='upper')
-            ax2.set_zorder(1)
+            # ax2.set_zorder(1)
             ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
             ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
 
