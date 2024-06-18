@@ -86,14 +86,6 @@ def scale_extent(extent, scale_factor):
     height = (extent[3] - extent[2]) * scale_factor
     return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
 
-def remove_img_background(img_path):
-    bgcolor = [84,1,68]
-    img = cv2.imread(img_path)
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2BGRA)
-
-    img[np.all(img == bgcolor + [255], axis =2)] = [0,0,0,0]
-    return img
-
 def update_mode(mode, part_num):
 
     global frequency
@@ -179,26 +171,6 @@ def update_highlight():
     highlight_patch.set_transform(Affine2D().translate(long[selected_index], lat[selected_index]) + ax2.transData)
     ax2.add_patch(highlight_patch)
     fig.canvas.draw_idle()
-
-
-
-    # radius_lat, radius_long = meters_to_degrees(range_max)
-
-    # vertices, codes = create_sector_path(radius_lat, radius_long)
-    # # for index, angle in zip(selected_index, heading):
-    # rotation_transform = Affine2D().rotate_deg(heading[selected_index])
-    # rotated_vertices = rotation_transform.transform(vertices)
-    # path = Path(rotated_vertices, codes)
-    # patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
-    # ax2.scatter(long[selected_index], lat[selected_index], s=500, facecolor='none', edgecolor='r', marker=path)
-
-
-    # if selected_index is not None:
-    #     highlight.set_data(long[selected_index], lat[selected_index])
-    # else:
-    #     print(f"SELECTED{selected_index}")
-    #     highlight.set_data([], [])
-    # fig.canvas.draw()
 
 def deg2rad(deg):
     return deg * (np.pi / 180)
