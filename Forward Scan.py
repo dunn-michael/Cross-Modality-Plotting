@@ -8,8 +8,6 @@ from osgeo import gdal
 import cv2
 from PIL import Image
 
-
-
 selected_index = None
 lat = []
 long = []
@@ -18,8 +16,6 @@ heading= []
 x=[]
 y=[]
 oculusTimestamp = []
-# width = []
-# height = []
 imgData = []
 plot = None
 partNumber = []
@@ -27,7 +23,6 @@ mode = []
 selected_index =0 
 quitGraph = False
 j = 0
-
 highlight_patch = None
 
 def meters_to_degrees(meters):
@@ -39,7 +34,6 @@ def meters_to_degrees(meters):
 
     return degrees_lat,degrees_long
 
-# Function to create the sector path with rotation
 def create_sector_path(radius_lat, radius_long, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
     theta = np.linspace(thetamin, thetamax, num_points)
     x = radius_long * np.cos(theta)
@@ -64,7 +58,6 @@ def read_tfw(tfw_path):
         neg_y_pixel_length = float(lines[3])
         x_coord = float(lines[4])
         y_coord = float(lines[5])
-        # print(x_coord, y_coord)
         return x_pixel_length, neg_y_pixel_length, x_coord, y_coord
 
 def read_tiff_image(img_path):
@@ -169,6 +162,9 @@ def update_highlight():
         highlight_patch.remove()
     highlight_patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
     highlight_patch.set_transform(Affine2D().translate(long[selected_index], lat[selected_index]) + ax2.transData)
+    ax.set_theta_offset(0)
+    rad_heading = deg2rad(heading[selected_index])
+    ax.set_theta_offset(rad_heading)
     ax2.add_patch(highlight_patch)
     fig.canvas.draw_idle()
 
@@ -233,9 +229,6 @@ def on_click(event):
         update_highlight()
 
         data = npzfile['arr_1'][selected_index]
-        # print(type(plot))
-        # print(type(selected_index))
-        # print(np.asarray(data).reshape(height, width))
         plot.set_array(np.asarray(data).reshape(height, width))
         fig.canvas.draw_idle()
         fig.canvas.flush_events()
@@ -263,6 +256,7 @@ def on_key(event):
 
 def main():
     global quitGraph
+    global ax
     global ax2
     global highlight
     global fig
@@ -326,7 +320,7 @@ def main():
     T, R = np.meshgrid(theta, r)
     z = np.zeros_like(T)
     plot = ax.pcolormesh(T, R, z, cmap='gray', shading='auto', vmin=0, vmax=100)
-    ax.set_theta_zero_location("N")
+    # ax.set_theta_zero_location("N")
     ax.set_ylim(range_min, range_max)
 
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
@@ -341,75 +335,27 @@ def main():
             img_width = ds.RasterXSize * x_pixel_length
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-            # long.append(x_coord)
-            # lat.append(y_coord)
             ax2.imshow(img, extent=img_extent,origin='upper')
             ax2.set_zorder(1)
             ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
             ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
-            # plt.draw()
 
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
-    # while not quitGraph:
     index = selected_index
     data = npzfile['arr_1'][index]
             
-    # NOTE
-# # Highlight specific points with different rotation angles
-# Create a scatter plot
     for i in range(len(long)):
         highlighted_index.append(i)
-    # Loop through each highlighted point and plot it with the respective rotation
-
-    # Set the same aspect ratio
-    # ax.set_aspect('equal')
-
-    # NOTE
 
     fig.canvas.mpl_connect('button_press_event', on_click)
     fig.canvas.mpl_connect('key_press_event', on_key)
-    # im = plt.imread("image.Tiff")
     plot.set_array(np.asarray(data).reshape(height, width))
     print("Graphing")
     plt.show()
+
     while not quitGraph:
-        # for img_path, tfw_path in zip(sidescan_images, tfw_files):
-        #     try:
-        #         x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
-        #         ds = gdal.Open(img_path)
-
-        #         img = read_tiff_image(img_path)
-        #         img_width = ds.RasterXSize * x_pixel_length
-        #         img_height = ds.RasterYSize * abs(neg_y_pixel_length)
-        #         img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-        #         # long.append(x_coord)
-        #         # lat.append(y_coord)
-        #         ax2.imshow(img, extent=img_extent,origin='upper')
-        #         ax2.set_zorder(1)
-        #         ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
-        #         ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
-                # plt.draw()
-
-            # except Exception as e:
-            #     print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
-            
-        # ax2.scatter(long,lat, color='blue')
-        # fig.canvas.draw_idle()
-        # fig.canvas.flush_events()
-
-        # plt.show()
-
-
-        # fig.canvas.mpl_connect('button_press_event', on_click)
-        # fig.canvas.mpl_connect('key_press_event', on_key)
-        # # im = plt.imread("image.Tiff")
-        # plot.set_array(np.asarray(data).reshape(height, width))
-        # ax2.scatter(long,lat, color='blue')
-        # fig.canvas.draw_idle()
-        # fig.canvas.flush_events()
-        # plt.show()
         if not plt.fignum_exists(1):
             plt.close()
             quitGraph = True
