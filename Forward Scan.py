@@ -34,7 +34,7 @@ def meters_to_degrees(meters):
 
     return degrees_lat,degrees_long
 
-def create_sector_path(radius_lat, radius_long, thetamin=np.radians(35), thetamax=np.radians(-35), num_points=100):
+def create_sector_path(radius_lat, radius_long, thetamin=np.radians(65), thetamax=np.radians(-65), num_points=100):
     theta = np.linspace(thetamin, thetamax, num_points)
     x = radius_long * np.cos(theta)
     y = radius_lat * np.sin(theta)
@@ -72,12 +72,12 @@ def read_tiff_image(img_path):
         print(f"Error reading TIFF image {img_path}: {e}")
         raise
 
-def scale_extent(extent, scale_factor):
-    x_center = (extent[0] + extent[1]) / 2
-    y_center = (extent[2] + extent[3]) / 2
-    width = (extent[1] - extent[0]) * scale_factor
-    height = (extent[3] - extent[2]) * scale_factor
-    return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
+# def scale_extent(extent, scale_factor):
+#     x_center = (extent[0] + extent[1]) / 2
+#     y_center = (extent[2] + extent[3]) / 2
+#     width = (extent[1] - extent[0]) * scale_factor
+#     height = (extent[3] - extent[2]) * scale_factor
+#     return [x_center - width / 2, x_center + width / 2, y_center - height / 2, y_center + height / 2]
 
 def update_mode(mode, part_num):
 
@@ -162,7 +162,6 @@ def update_highlight():
         highlight_patch.remove()
     highlight_patch = PathPatch(path, facecolor='none', edgecolor='r', lw=2)
     highlight_patch.set_transform(Affine2D().translate(long[selected_index], lat[selected_index]) + ax2.transData)
-    ax.set_theta_offset(0)
     rad_heading = deg2rad(heading[selected_index])
     ax.set_theta_offset(rad_heading)
     ax2.add_patch(highlight_patch)
@@ -281,7 +280,7 @@ def main():
     # it into lists
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
-    index = 1000
+    index = 0
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
     height = npzfile['arr_3'][index]
@@ -353,6 +352,8 @@ def main():
     fig.canvas.mpl_connect('key_press_event', on_key)
     plot.set_array(np.asarray(data).reshape(height, width))
     print("Graphing")
+    rad_heading = deg2rad(heading[selected_index])
+    update_highlight()
     plt.show()
 
     while not quitGraph:
