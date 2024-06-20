@@ -6,6 +6,8 @@ from matplotlib.transforms import Affine2D
 from osgeo import gdal
 from PIL import Image
 from matplotlib.widgets import CheckButtons
+import os
+from tkinter import filedialog
 
 lat = []
 long = []
@@ -420,3 +422,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    # choice = ''
+    # while choice != 'type' and choice != 'choose':
+    #     choice = input("Would you like to type your file directory or choose it? (type / choose)").lower()
+
+    # if choice == 'choose':
+    #     Tk().withdraw() # prevents an empty tkinter window from appearing
+    #     directory = filedialog.askdirectory()
+    # elif choice == 'type':
+    #     directory = input("Enter the directory with your TIFF and TFW files : ")
+
+    # for filename in os.listdir(directory):
+    #     if filename.endswith('.TFW'):
+    #         tfw_files.append(directory + '/' + filename)
+    #     elif filename.endswith('.Tiff'):
+    #         sidescan_images.append(directory + '/' + filename)
+    # sidescan_images = ['Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP37-L.Tiff']
+    # tfw_files = ['Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP37-L.TFW']
