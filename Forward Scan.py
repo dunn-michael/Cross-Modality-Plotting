@@ -23,6 +23,8 @@ quitGraph = False
 j = 0
 highlight_patch = None
 image_artists = []
+zoomed = False
+path = False
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -43,7 +45,6 @@ def create_sector_path(radius_lat, radius_long, thetamin=np.radians(65), thetama
     y = radius_lat * np.sin(theta)
     
     vertices = np.vstack((x, y)).T
-
     vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
     
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
@@ -240,15 +241,50 @@ def on_key(event):
     Changes the selected index and updates the highlight so that
     the proper area is highlighted on the graph"""
 
+    global zoomed
     global quitGraph
     global selected_index
+    global path
+    global scatter
     if selected_index is None:
         return
 
-    if event.key == 'right' or event.key == 'up':
+    if event.key == 'z':
+        zoomed = not zoomed
+        if zoomed:
+            ax2.set_xlim(xax_min, xax_max + img_width)
+            ax2.set_ylim(yax_min - img_height, yax_max)
+        else:
+            range = meters_to_degrees(range_max)
+            range_x = range[0]
+            range_y = range[1]
+            ax2.set_xlim(long[selected_index] - range_x, long[selected_index] + range_x)
+            # ax2.set_xlim(long[selected_index], long[selected_index] + range_x)
+            ax2.set_ylim(lat[selected_index] - range_y, lat[selected_index] + range_y)
+            # ax2.set_ylim(lat[selected_index], lat[selected_index] + range_y)
+            long[selected_index]
+            lat[selected_index]
+            pass
+
+    if event.key == "p":
+        path = not path
+        scatter.set_visible(path)
+        # ax2.scatter(long,lat, marker='o', zorder = 0).set_visible(path)
+
+    if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
-    elif event.key == 'left' or event.key == 'down':
+    elif event.key == 'left':
         selected_index = (selected_index - 1) % len(long)
+    elif event.key == 'up':
+        if(selected_index + 5 > len(long)):
+            selected_index = len(long)
+        else:
+            selected_index = (selected_index + 5) % len(long)
+    elif event.key == 'down':
+        if(selected_index - 5 < 0):
+            selected_index = 0
+        else:
+            selected_index = (selected_index - 5) % len(long)
     elif event.key == 'escape':
         plt.close()
         quitGraph = True
@@ -263,7 +299,9 @@ def on_key(event):
 def update_images(label):
     index = int(label.split(' ')[-1])
     image_artists[index].set_visible(not image_artists[index].get_visible())
-    plt.draw()
+    # plt.draw()
+    fig.canvas.draw_idle()
+    fig.canvas.flush_events()
 
 def main():
     global quitGraph
@@ -277,6 +315,16 @@ def main():
     global height
     global width
     global image_artists
+    global xax_min
+    global xax_max
+    global yax_min
+    global yax_max
+    global img_height
+    global img_width
+    global scatter
+
+    file_long = []
+    file_lat  = []
 
     sidescan_images = []
     tfw_files = []
@@ -336,24 +384,34 @@ def main():
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
             img_artist = ax2.imshow(img, extent=img_extent, origin='upper')
             # img_artist = ax2.imshow(img, extent=img_extent, origin='upper', alpha=0.7)
-            ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
-            ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
 
             image_artists.append(img_artist)
             img_artist.set_visible(False)
             check_labels.append(f'Image {i}')
+            file_long.append(x_coord)
+            file_lat.append(y_coord)
+            
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
+    xax_min = min(file_long)
+    xax_max = max(file_long)
+    yax_min = min(file_lat)
+    yax_max = max(file_lat)
+
+    ax2.set_xlim(xax_min, xax_max + img_width)
+    ax2.set_ylim(yax_min - img_height, yax_max)
     rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
     check = CheckButtons(rax, check_labels, [False] * len(check_labels))
     check.on_clicked(update_images)
 
+    scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
+    scatter.set_visible(False)
     index = selected_index
     data = npzfile['arr_1'][index]
     for i in range(len(long)):
         highlighted_index.append(i)
-
+    
     fig.canvas.mpl_connect('button_press_event', on_click)
     fig.canvas.mpl_connect('key_press_event', on_key)
     plot.set_array(np.asarray(data).reshape(height, width))
