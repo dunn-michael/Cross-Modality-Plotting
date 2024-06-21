@@ -40,5 +40,4 @@ Note : After running the rosbag it might take a little while for the messages to
 
  # todos
 
- - Document everything. And get someone to read through and use your documentation and iterate as necessary
  - Put it on the lab's bitbucket 
