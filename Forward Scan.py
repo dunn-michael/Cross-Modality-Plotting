@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D
+import matplotlib.gridspec as gridspec
 from osgeo import gdal
-import cv2
 from PIL import Image
+from matplotlib.widgets import CheckButtons
+import os
+from tkinter import filedialog
 
 lat = []
 long = []
@@ -19,10 +21,13 @@ imgData = []
 plot = None
 partNumber = []
 mode = []
-selected_index =0 
+selected_index = 0
 quitGraph = False
 j = 0
 highlight_patch = None
+image_artists = []
+zoomed = False
+path = False
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -43,7 +48,6 @@ def create_sector_path(radius_lat, radius_long, thetamin=np.radians(65), thetama
     y = radius_lat * np.sin(theta)
     
     vertices = np.vstack((x, y)).T
-
     vertices = np.vstack(([[0, 0]], vertices, [[0, 0]]))
     
     codes = [Path.MOVETO] + [Path.LINETO] * (len(vertices) - 2) + [Path.CLOSEPOLY]
@@ -240,15 +244,44 @@ def on_key(event):
     Changes the selected index and updates the highlight so that
     the proper area is highlighted on the graph"""
 
+    global zoomed
     global quitGraph
     global selected_index
+    global path
+    global scatter
     if selected_index is None:
         return
 
-    if event.key == 'right' or event.key == 'up':
+    if event.key == 'z':
+        zoomed = not zoomed
+        if not zoomed:
+            ax2.set_xlim(xax_min, xax_max + img_width)
+            ax2.set_ylim(yax_min - img_height, yax_max)
+        else:
+            range = meters_to_degrees(range_max)
+            range_x = range[0]
+            range_y = range[1]
+            ax2.set_xlim(long[selected_index] - range_x, long[selected_index] + range_x)
+            ax2.set_ylim(lat[selected_index] - range_y, lat[selected_index] + range_y)
+
+    if event.key == "p":
+        path = not path
+        scatter.set_visible(path)
+
+    if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
-    elif event.key == 'left' or event.key == 'down':
+    elif event.key == 'left':
         selected_index = (selected_index - 1) % len(long)
+    elif event.key == 'up':
+        if(selected_index + 5 > len(long)):
+            selected_index = len(long)
+        else:
+            selected_index = (selected_index + 5) % len(long)
+    elif event.key == 'down':
+        if(selected_index - 5 < 0):
+            selected_index = 0
+        else:
+            selected_index = (selected_index - 5) % len(long)
     elif event.key == 'escape':
         plt.close()
         quitGraph = True
@@ -257,6 +290,13 @@ def on_key(event):
     update_highlight()
     data = npzfile['arr_1'][selected_index]
     plot.set_array(np.asarray(data).reshape(height, width))
+    fig.canvas.draw_idle()
+    fig.canvas.flush_events()
+
+def update_images(label):
+    index = int(label.split(' ')[-1]) - 1
+    image_artists[index].set_visible(not image_artists[index].get_visible())
+    # plt.draw()
     fig.canvas.draw_idle()
     fig.canvas.flush_events()
 
@@ -271,20 +311,42 @@ def main():
     global plot
     global height
     global width
+    global image_artists
+    global xax_min
+    global xax_max
+    global yax_min
+    global yax_max
+    global img_height
+    global img_width
+    global scatter
+
+    file_long = []
+    file_lat  = []
 
     sidescan_images = []
     tfw_files = []
     highlighted_index = []
-    # NOTE:
-    # 33 - 56 is the full range for this set of data, it may change with other data sets
-    # for i in range(33, 56):
-    for i in range(33, 37):
-        sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
-        tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
 
+    choice = ''
+    while choice != 'type' and choice != 'choose':
+        choice = input("Would you like to type your file directory or choose it? (type / choose)").lower()
 
-    # Load the data into the program and intiliaze
-    # it into lists
+    if choice == 'choose':
+        # Tk().withdraw() # prevents an empty tkinter window from appearing
+        # tkin
+        directory = filedialog.askdirectory()
+    elif choice == 'type':
+        directory = input("Enter the directory with your TIFF and TFW files : ")
+
+    for filename in os.listdir(directory):
+        if filename.endswith('.TFW'):
+            tfw_files.append(directory + '/' + filename)
+            filename_notype = filename.split('.TFW')[0]
+            sidescan_images.append(directory + '/' + filename_notype + '.Tiff')
+
+    sidescan_images = sorted(sidescan_images)
+    tfw_files = sorted(tfw_files)
+
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
     index = 0
@@ -295,8 +357,6 @@ def main():
     partNumber = npzfile['arr_4'][index]
     mode = npzfile['arr_5'][index]
     j = 0
-    # This is for only getting the timestamps that have graphs accociated.
-    # This way we aren't generating thousand of other points on the scatterplot
     for i in range(len(npzfile['arr_0'])):
         found = False
         while not found:
@@ -311,48 +371,68 @@ def main():
             else:
                 break
 
-    # The file could have different modes in it, this will update the size of the graph if the mode is different
     update_mode(mode, partNumber)
-    # Functions that setup the polar and cartesian graphs
-    fig = plt.figure()
-    ax2 = fig.add_subplot(121)
-    ax = fig.add_subplot(122,projection='polar')
-    ax.set_thetamin(-horizontal_aperture/2)
-    ax.set_thetamax(horizontal_aperture/2)
-    theta = np.linspace(-horizontal_aperture/2, horizontal_aperture/2, width)*np.pi/180
+    fig = plt.figure(figsize=(15,8))
+    # ax2 = fig.add_subplot(121)
+    # ax = fig.add_subplot(122, projection='polar')
+
+    gs = gridspec.GridSpec(2,3, width_ratios=[1,4,3])
+
+    check_ax = fig.add_subplot(gs[:,0])
+    ax2 = fig.add_subplot(gs[:,1])
+    ax = fig.add_subplot(gs[:,2], projection='polar')
+
+    check_ax.axis('off')
+
+    ax.set_thetamin(-horizontal_aperture / 2)
+    ax.set_thetamax(horizontal_aperture / 2)
+    theta = np.linspace(-horizontal_aperture / 2, horizontal_aperture / 2, width) * np.pi / 180
     r = np.linspace(range_min, range_max, height)
     T, R = np.meshgrid(theta, r)
     z = np.zeros_like(T)
     plot = ax.pcolormesh(T, R, z, cmap='gray', shading='auto', vmin=0, vmax=100)
-    # ax.set_theta_zero_location("N")
     ax.set_ylim(range_min, range_max)
-
     highlight, = ax2.plot([], [], 'o', markersize=12, markerfacecolor='none', markeredgecolor='red', markeredgewidth=2)
 
-
-    for img_path, tfw_path in zip(sidescan_images, tfw_files):
+    check_labels = []
+    for i, (img_path, tfw_path) in enumerate(zip(sidescan_images, tfw_files)):
         try:
             x_pixel_length, neg_y_pixel_length, x_coord, y_coord = read_tfw(tfw_path)
             ds = gdal.Open(img_path)
-
             img = read_tiff_image(img_path)
             img_width = ds.RasterXSize * x_pixel_length
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
-            ax2.imshow(img, extent=img_extent,origin='upper')
-            ax2.set_zorder(1)
-            ax2.set_xlim(-158.067880292173, -158.06637171583 + img_width)
-            ax2.set_ylim(21.647407458227 - img_height, 21.6491011838888)
+            img_artist = ax2.imshow(img, extent=img_extent, origin='upper')
 
+            image_artists.append(img_artist)
+            img_artist.set_visible(False)
+            check_labels.append(f'Image {i + 1}')
+            file_long.append(x_coord)
+            file_lat.append(y_coord)
+            
         except Exception as e:
             print(f"Error processing image {img_path} with TFW file {tfw_path}: {e}")
 
+    xax_min = min(file_long)
+    xax_max = max(file_long)
+    yax_min = min(file_lat)
+    yax_max = max(file_lat)
+
+    ax2.set_xlim(xax_min, xax_max + img_width)
+    ax2.set_ylim(yax_min - img_height, yax_max)
+    # rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
+    # check = CheckButtons(rax, check_labels, [False] * len(check_labels))
+    check = CheckButtons(check_ax, check_labels, [False] * len(check_labels))
+    check.on_clicked(update_images)
+
+    scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
+    scatter.set_visible(False)
     index = selected_index
     data = npzfile['arr_1'][index]
-            
     for i in range(len(long)):
         highlighted_index.append(i)
-
+    
     fig.canvas.mpl_connect('button_press_event', on_click)
     fig.canvas.mpl_connect('key_press_event', on_key)
     plot.set_array(np.asarray(data).reshape(height, width))
