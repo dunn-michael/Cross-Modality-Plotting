@@ -346,11 +346,6 @@ def main():
     sidescan_images = sorted(sidescan_images)
     tfw_files = sorted(tfw_files)
 
-    # # for i in range(33, 37):
-    # for i in range(33, 56):
-    #     sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
-    #     tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
-
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
     index = 0
