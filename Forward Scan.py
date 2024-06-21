@@ -8,7 +8,6 @@ from PIL import Image
 from matplotlib.widgets import CheckButtons
 import os
 from tkinter import filedialog
-# import tkinter as Tk
 
 lat = []
 long = []
@@ -254,7 +253,7 @@ def on_key(event):
 
     if event.key == 'z':
         zoomed = not zoomed
-        if zoomed:
+        if not zoomed:
             ax2.set_xlim(xax_min, xax_max + img_width)
             ax2.set_ylim(yax_min - img_height, yax_max)
         else:
@@ -262,17 +261,11 @@ def on_key(event):
             range_x = range[0]
             range_y = range[1]
             ax2.set_xlim(long[selected_index] - range_x, long[selected_index] + range_x)
-            # ax2.set_xlim(long[selected_index], long[selected_index] + range_x)
             ax2.set_ylim(lat[selected_index] - range_y, lat[selected_index] + range_y)
-            # ax2.set_ylim(lat[selected_index], lat[selected_index] + range_y)
-            long[selected_index]
-            lat[selected_index]
-            pass
 
     if event.key == "p":
         path = not path
         scatter.set_visible(path)
-        # ax2.scatter(long,lat, marker='o', zorder = 0).set_visible(path)
 
     if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
@@ -349,15 +342,14 @@ def main():
             tfw_files.append(directory + '/' + filename)
             filename_notype = filename.split('.TFW')[0]
             sidescan_images.append(directory + '/' + filename_notype + '.Tiff')
-    print(len(sidescan_images))
-    print(len(tfw_files))
-    # sidescan_images = ['Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP37-L.Tiff']
-    # tfw_files = ['Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP37-L.TFW']
 
-    # for i in range(33, 37):
-    for i in range(33, 56):
-        sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
-        tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
+    sidescan_images = sorted(sidescan_images)
+    tfw_files = sorted(tfw_files)
+
+    # # for i in range(33, 37):
+    # for i in range(33, 56):
+    #     sidescan_images.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP'+ str(i) + '-L.Tiff')
+    #     tfw_files.append('Sidescan-Data/20240414-010943-UTC_0-2024-04-10_oahu_three-tables-cross-modality-2mDFS-IVER3-3099_WP' + str(i) + '-L.TFW')
 
     courseInfo = np.load('course-info.npy')
     npzfile = np.load("oculus-data.npz")
