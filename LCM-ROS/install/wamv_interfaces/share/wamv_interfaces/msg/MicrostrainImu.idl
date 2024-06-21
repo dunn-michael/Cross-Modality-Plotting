@@ -1,0 +1,139 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from wamv_interfaces/msg/MicrostrainImu.msg
+// generated code does not contain a copyright notice
+
+
+module wamv_interfaces {
+  module msg {
+    typedef float float__9[9];
+    typedef float float__3[3];
+    @verbatim (language="comment", text=
+      "header header                      # Header for ROS message")
+    struct MicrostrainImu {
+      @verbatim (language="comment", text=
+        "Timestamp")
+      int64 timestamp;
+
+      @verbatim (language="comment", text=
+        "Scaled Accelerometer X")
+      float scaled_accel_x;
+
+      @verbatim (language="comment", text=
+        "Scaled Accelerometer Y")
+      float scaled_accel_y;
+
+      @verbatim (language="comment", text=
+        "Scaled Accelerometer Z")
+      float scaled_accel_z;
+
+      @verbatim (language="comment", text=
+        "Scaled Gyroscope X")
+      float scaled_gyro_x;
+
+      @verbatim (language="comment", text=
+        "Scaled Gyroscope Y")
+      float scaled_gyro_y;
+
+      @verbatim (language="comment", text=
+        "Scaled Gyroscope Z")
+      float scaled_gyro_z;
+
+      @verbatim (language="comment", text=
+        "Scaled Magnetometer X")
+      float scaled_mag_x;
+
+      @verbatim (language="comment", text=
+        "Scaled Magnetometer Y")
+      float scaled_mag_y;
+
+      @verbatim (language="comment", text=
+        "Scaled Magnetometer Z")
+      float scaled_mag_z;
+
+      @verbatim (language="comment", text=
+        "Delta Theta X")
+      float delta_theta_x;
+
+      @verbatim (language="comment", text=
+        "Delta Theta Y")
+      float delta_theta_y;
+
+      @verbatim (language="comment", text=
+        "Delta Theta Z")
+      float delta_theta_z;
+
+      @verbatim (language="comment", text=
+        "Delta Velocity X")
+      float delta_vel_x;
+
+      @verbatim (language="comment", text=
+        "Delta Velocity Y")
+      float delta_vel_y;
+
+      @verbatim (language="comment", text=
+        "Delta Velocity Z")
+      float delta_vel_z;
+
+      @verbatim (language="comment", text=
+        "float32[3][3] orient_matrix         # Orientation Matrix (3x3)" "\n"
+        "Orientation Matrix (3x3)")
+      float__9 orient_matrix;
+
+      @verbatim (language="comment", text=
+        "Roll")
+      float roll;
+
+      @verbatim (language="comment", text=
+        "Pitch")
+      float pitch;
+
+      @verbatim (language="comment", text=
+        "Yaw")
+      float yaw;
+
+      @verbatim (language="comment", text=
+        "Orientation Quaternion (x, y, z)")
+      float__3 orient_quaternion;
+
+      @verbatim (language="comment", text=
+        "Stabilized Magnetometer X")
+      float stabilized_mag_x;
+
+      @verbatim (language="comment", text=
+        "Stabilized Magnetometer Y")
+      float stabilized_mag_y;
+
+      @verbatim (language="comment", text=
+        "Stabilized Magnetometer Z")
+      float stabilized_mag_z;
+
+      @verbatim (language="comment", text=
+        "Stabilized Accelerometer X")
+      float stabilized_accel_x;
+
+      @verbatim (language="comment", text=
+        "Stabilized Accelerometer Y")
+      float stabilized_accel_y;
+
+      @verbatim (language="comment", text=
+        "Stabilized Accelerometer Z")
+      float stabilized_accel_z;
+
+      @verbatim (language="comment", text=
+        "GPS Correlation Timestamp (Time of Week)")
+      double gps_correl_timestamp_tow;
+
+      @verbatim (language="comment", text=
+        "GPS Correlation Timestamp (Week Number)")
+      int32 gps_correl_timestamp_week_num;
+
+      @verbatim (language="comment", text=
+        "GPS Correlation Timestamp Flags")
+      int32 gps_correl_timestamp_flags;
+
+      @verbatim (language="comment", text=
+        "Scaled Ambient Pressure")
+      float scaled_ambient_pressure;
+    };
+  };
+};

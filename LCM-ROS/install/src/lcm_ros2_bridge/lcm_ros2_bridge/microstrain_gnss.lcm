@@ -1,0 +1,79 @@
+package lcm_messages;
+
+struct microstrain_gnss
+{
+    int64_t timestamp;
+    
+    // CH_FIELD_GNSS_LLH_POSITION
+    double latitude;
+    double longitude;
+    double heightAboveElipsoid;
+    double heightAboveMSL;
+    float horizontalAccuracy;
+    float verticalAccuracy;
+
+    // CH_FIELD_GNSS_ECEF_POSITION
+    double ecefPosX;
+    double ecefPosY;
+    double ecefPosZ;
+    float ecefPosAccuracy;
+
+    // CH_FIELD_GNSS_NED_VELOCITY
+    float northVelocity;
+    float eastVelocity;
+    float downVelocity;
+    float speed;
+    float groundSpeed;
+    float heading;
+    float speedAccuracy;
+    float headingAccuracy;
+
+    // CH_FIELD_GNSS_ECEF_VELOCITY
+    float ecefVelX;
+    float ecefVelY;
+    float ecefVelZ;
+    float ecefVelAccuracy;
+
+    // CH_FIELD_GNSS_DOP
+    float geometricDOP;
+    float positionDOP;
+    float horizontalDOP;
+    float verticalDOP;
+    float timeDOP;
+    float northingDOP;
+    float eastingDOP;
+
+    // CH_FIELD_GNSS_UTC_TIME
+    int64_t utcTimestamp;
+    int32_t utcTimestampFlags;
+
+    // CH_FIELD_GNSS_GPS_TIME
+    double gpsTimeTow;
+    int32_t gpsTimeWeekNum;
+
+    // CH_FIELD_GNSS_CLOCK_INFO
+    double gpsClockBias;
+    double gpsClockDrift;
+    double gpsClockAccuracy;
+
+    // CH_FIELD_GNSS_FIX_INFO
+    int16_t gnssFixType;
+    int16_t gnssFixSvCount;
+    int32_t gnssFixFlags;
+
+    // CH_FIELD_GNSS_SPACE_VEHICLE_INFO
+    // This one changes depending on how many satellites we're hooked to, we can figure something out later
+
+    // CH_FIELD_GNSS_HARDWARE_STATUS
+    int16_t sensorState;
+    int16_t antennaState;
+    int16_t antennaPower;
+
+    // CH_FIELD_GNSS_DGNSS_INFO
+    float dgnss_newestAge_gnssBase_0;
+    int16_t dgnss_baseStationStatus_gnssBase_0; // This one was the only signed one, the others are technically unsigned, so I upped their bits by one
+    int32_t dgnss_numChannels_gnssBase_0;
+
+    // CH_FIELD_GNSS_DGNSS_CHANNEL_STATUS
+    
+}
