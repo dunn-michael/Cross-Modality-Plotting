@@ -1,0 +1,147 @@
+package lcm_messages;
+
+struct microstrain_est
+{
+    int64_t timestamp;
+    
+    // CH_FIELD_ESTFILTER_ESTIMATED_LLH_POS
+    double estLatitude;
+    double estLongitude;
+    double estHeightAboveElipsoid;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_NED_VELOCITY
+    float estNorthVelocity;
+    float estEastVelocity;
+    float estDownVelocity;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ORIENT_QUATERNION
+    float estOrientQuaternion[3];
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ORIENT_MATRIX
+    float estOrientMatrix[3][3];
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ORIENT_EULER
+    float estRoll;
+    float estPitch;
+    float estYaw;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_GYRO_BIAS
+    float estGyroBiasX;
+    float estGyroBiasY;
+    float estGyroBiasZ;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ACCEL_BIAS
+    float estAccelBiasX;
+    float estAccelBiasY;
+    float estAccelBiasZ;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_LLH_UNCERT
+    float estNorthPositionUncert;
+    float estEastPositionUncert;
+    float estDownPositionUncert;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_NED_UNCERT
+    float estNorthVelocityUncert;
+    float estEastVelocityUncert;
+    float estDownVelocityUncert;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ATT_UNCERT_EULER
+    float estRollUncert;
+    float estPitchUncert;
+    float estYawUncert;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_GYRO_BIAS_UNCERT
+    float estGyroBiasXUncert;
+    float estGyroBiasYUncert;
+    float estGyroBiasZUncert;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ACCEL_BIAS_UNCERT
+    float estAccelBiasXUncert;
+    float estAccelBiasYUncert;
+    float estAccelBiasZUncert;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_LINEAR_ACCEL
+    float estLinearAccelX;
+    float estLinearAccelY;
+    float estLinearAccelZ;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ANGULAR_RATE
+    float estAngularRateX;
+    float estAngularRateY;
+    float estAngularRateZ;
+
+    // CH_FIELD_ESTFILTER_WGS84_LOC_GRAV_MAGNITUDE
+    float estWGS84LocalGravMagnitude;
+
+    // CH_FIELD_ESTFILTER_FILTER_STATUS
+    int32_t estFilterState;
+    int32_t estFilterDynamicsMode;
+    int32_t estFilterStatusFlags;
+
+    // CH_FIELD_ESTFILTER_GPS_TIMESTAMP
+    double estFilterGpsTimeTow;
+    int32_t estFilterGpsTimeWeekNum;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_ATT_UNCERT_QUAT
+    float estAttitudeUncertQuaternion[3];
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_GRAVITY_VECTOR
+    float estGravityVectorX;
+    float estGravityVectorY;
+    float estGravityVectorZ;
+
+    // CH_FIELD_ESTFILTER_HEADING_UPDATE_SOURCE
+    float estHeading;
+    float estHeadingUncert;
+    int32_t estHeadingSource;
+
+    // CH_FIELD_ESTFILTER_MAGNETIC_MODEL_SLN
+    float estMagneticModelSlnNorth;
+    float estMagneticModelSlnEast;
+    float estMagneticModelSlnDown;
+    float estMagneticModelSlnInclination;
+    float estMagneticModelSlnDeclination;
+
+    // CH_FIELD_ESTFILTER_ESTIMATED_GYRO_SCALE_FACTOR
+    float estGyroScaleFactorX;
+    float estGyroScaleFactorY;
+    float estGyroScaleFactorZ;
+
+    // CH_FIELD_ESTFILTER_ACCEL_SCALE_FACTOR
+    float estAccelScaleFactorX;
+    float estAccelScaleFactorY;
+    float estAccelScaleFactorZ;
+
+    // CH_FIELD_ESTFILTER_GYRO_SCALE_FACTOR_UNCERT
+    float estGyroScaleFactorXUncert;
+    float estGyroScaleFactorYUncert;
+    float estGyroScaleFactorZUncert;
+
+    // CH_FIELD_ESTFILTER_ACCEL_SCALE_FACTOR_UNCERT
+    float estAccelScaleFactorXUncert;
+    float estAccelScaleFactorYUncert;
+    float estAccelScaleFactorZUncert;
+
+    // CH_FIELD_ESTFILTER_COMPENSATED_ACCEL
+    float estCompensatedAccelX;
+    float estCompensatedAccelY;
+    float estCompensatedAccelZ;
+
+    // CH_FIELD_ESTFILTER_STD_ATMOSPHERE_MODEL
+    float estStdAtmModelGeometricAlt;
+    float estStdAtmModelGeopotentialAlt;
+    float estStdAtmModelTemperature;
+    float estStdAtmModelPressure;
+    float estStdAtmModelDensity;
+
+    // CH_FIELD_ESTFILTER_PRESSURE_ALTITUDE
+    float estPressureAlt;
+
+    // CH_FIELD_ESTFILTER_MAG_AUTO_HARD_IRON_OFFSET
+    float estMagAutoHardIronOffsetX;
+    float estMagAutoHardIronOffsetY;
+    float estMagAutoHardIronOffsetZ;
+
+    // CH_FIELD_ESTFILTER_MAG_AUTO_SOFT_IRON_MATRIX
+    float estMagAutoSoftIronMatrix[3][3];
+}
