@@ -1,0 +1,4 @@
+[console_scripts]
+bridge = lcm_ros2_bridge.bridge:main
+listener = lcm_ros2_bridge.subscriber_member_function:main
+

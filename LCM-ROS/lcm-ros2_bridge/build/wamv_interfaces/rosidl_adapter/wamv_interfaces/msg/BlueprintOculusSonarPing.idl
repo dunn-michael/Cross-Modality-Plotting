@@ -1,0 +1,32 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from wamv_interfaces/msg/BlueprintOculusSonarPing.msg
+// generated code does not contain a copyright notice
+
+#include "wamv_interfaces/msg/BlueprintOculusSonarFire.idl"
+#include "wamv_interfaces/msg/BlueprintOculusSonarImage.idl"
+
+module wamv_interfaces {
+  module msg {
+    struct BlueprintOculusSonarPing {
+      int64 timestamp;
+
+      int32 ping_id;
+
+      int16 part_number;
+
+      int32 start_time;
+
+      int32 num_ranges;
+
+      int32 num_beams;
+
+      sequence<int16> bearings;
+
+      float range_resolution;
+
+      wamv_interfaces::msg::BlueprintOculusSonarFire fire_msg;
+
+      wamv_interfaces::msg::BlueprintOculusSonarImage image_msg;
+    };
+  };
+};

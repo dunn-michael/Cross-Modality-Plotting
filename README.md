@@ -19,6 +19,7 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 # ROS
 Navigate to the lcm-ros2_bridge foler and run "source install/setup.bash"
+
 Run the command `colcon build`
 
 Run `ros2 run bag_subscriber gps_subscriber`
@@ -39,5 +40,4 @@ Note : After running the rosbag it might take a little while for the messages to
 
  # todos
 
- - Document everything. And get someone to read through and use your documentation and iterate as necessary
  - Put it on the lab's bitbucket 

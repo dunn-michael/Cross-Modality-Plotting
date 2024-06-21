@@ -1,0 +1,5 @@
+[console_scripts]
+data_subscriber = bag_subscriber.data_subscriber:main
+gps_subscriber = bag_subscriber.gps_subscriber:main
+img_subscriber = bag_subscriber.img_subscriber:main
+
