@@ -2,7 +2,7 @@
 Before you can graph your data, you need to get it first so make sure you go through the "ROS" section below before you try to graph.
 
 To graph, you will need TFW files their corresponding Tiff files, the course-info.npy and the oculus-data.npz files.
-Then all you will need to do is run the program and navigate to the location of the TFW and Tiff files.
+Then all you will need to do is run the "Forward Scan.py" program in the Plotting folder and navigate to the location of the TFW and Tiff files.
 
 **DO NOT SPAM OR HOLD DOWN ANY BUTTONS THIS CAN AND WILL CRASH THE PROGRAM**
 
@@ -18,6 +18,9 @@ Up and Down arrow keys navigte through the index 5 at a time
 'z' will zoom in on the selected index
 
 # ROS
+
+Note: You only need to do this if you have not already generated the course-info and oculus-data files
+
 Navigate to the lcm-ros2_bridge foler and run "source install/setup.bash"
 
 Run the command `colcon build`
@@ -37,7 +40,3 @@ Again once the "I heard" messages stop appearing, cancel the program.
 Once both of those are done move the "oculus-data.npz" and the "course-info.npy" files into the same directory as your program (the plotting folder).
 
 Note : After running the rosbag it might take a little while for the messages to start appearing, you may want to use the up and down arrow keys to slow down or speed up the rate at which the messages get sent. However, if you speed them up too much the program may crash or miss some messages
-
- # todos
-
- - Put it on the lab's bitbucket 
