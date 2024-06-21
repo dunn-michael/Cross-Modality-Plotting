@@ -449,11 +449,13 @@ def main():
     ax2.set_ylim(yax_min - img_height, yax_max)
 
     box = AuxTransformBox(ax2.transAxes)
-    check = CheckButtons(box, check_labels, [False] * len(check_labels))
+    check = CheckButtons(fig.add_axes([0.91, 0.4, 0.08, 0.15]), check_labels, [False] * len(check_labels))
+    check.on_clicked(update_images)
+    
     anchored_box = AnchoredAuxTransformBox(loc='center left', child=box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes)
     ax2.add_artist(anchored_box)
     make_draggable(anchored_box)
-    check.on_clicked(update_images)
+
 
 
 
