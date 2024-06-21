@@ -2,7 +2,7 @@
 Before you can graph your data, you need to get it first so make sure you go through the "ROS" section below before you try to graph.
 
 To graph, you will need TFW files their corresponding Tiff files, the course-info.npy and the oculus-data.npz files.
-Then all you will need to do is run the "Forward Scan.py" program in the Plotting folder and navigate to the location of the TFW and Tiff files.
+Then all you will need to do is run the "plot.py" program and navigate to the location of the TFW and Tiff files.
 
 **DO NOT SPAM OR HOLD DOWN ANY BUTTONS THIS CAN AND WILL CRASH THE PROGRAM**
 
