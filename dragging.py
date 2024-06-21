@@ -8,7 +8,8 @@ from osgeo import gdal
 from PIL import Image
 from matplotlib.widgets import CheckButtons
 from tkinter import filedialog
-from mpl_toolkits import make_axes_locatable
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredOffsetbox
+from matplotlib.offsetbox import AuxTransformBox
 
 lat = []
 long = []
@@ -34,28 +35,28 @@ def make_draggable(artist):
     artist.press = None
 
     def on_press(event):
-        if event.inaxes != artist: return
+        if event.inaxes != artist.ax: return
         contains, attrd = artist.contains(event)
         if not contains: return
-        artist.press = artist.get_frame(), event.xdata, event.ydata
+        artist.press = artist.get_window_extent(), event.xdata, event.ydata
 
     def on_motion(event):
         if artist.press is None: return
-        if event.inaxes != artist: return
-        frame, xpress, ypress = artist.press
+        if event.inaxes != artist.ax: return
+        bbox, xpress, ypress = artist.press
         dx = event.xdata - xpress
         dy = event.ydata - ypress
-        artist.set_x(frame.get_x() + dx)
-        artist.set_y(frame.get_y() + dy)
-        artist.figure.canvas.draw()
+        bbox = bbox.translated(dx, dy)
+        artist.set_bbox_to_anchor(bbox)
+        artist.ax.figure.canvas.draw()
 
     def on_release(event):
         artist.press = None
-        artist.figure.canvas.draw()
+        artist.ax.figure.canvas.draw()
 
-    artist.figure.canvas.mpl_connect('button_press_event', on_press)
-    artist.figure.canvas.mpl_connect('motion_notify_event', on_motion)
-    artist.figure.canvas.mpl_connect('button_release_event', on_release)
+    artist.ax.figure.canvas.mpl_connect('button_press_event', on_press)
+    artist.ax.figure.canvas.mpl_connect('motion_notify_event', on_motion)
+    artist.ax.figure.canvas.mpl_connect('button_release_event', on_release)
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -440,11 +441,14 @@ def main():
 
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
-    divider = make_axes_locatable(ax2)
-    rax = divider.append_axes("right", size="10%", pad=0.05)
-    check = CheckButtons(rax, check_labels, [False] * len(check_labels))
-    make_draggable(rax)
+    
+    box = AuxTransformBox(ax2.transAxes)
+    check = CheckButtons(box, check_labels, [False] * len(check_labels))
+    anchored_box = AnchoredOffsetbox(loc='center left', child=box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes, borderpad=0.)
+    ax2.add_artist(anchored_box)
+    make_draggable(anchored_box)
     check.on_clicked(update_images)
+
 
 
     scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
