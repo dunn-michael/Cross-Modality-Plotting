@@ -8,7 +8,7 @@ from osgeo import gdal
 from PIL import Image
 from matplotlib.widgets import CheckButtons
 from tkinter import filedialog
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredOffsetbox
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredAuxTransformBox
 from matplotlib.offsetbox import AuxTransformBox
 
 lat = []
@@ -450,7 +450,7 @@ def main():
 
     box = AuxTransformBox(ax2.transAxes)
     check = CheckButtons(box, check_labels, [False] * len(check_labels))
-    anchored_box = AnchoredOffsetbox(loc='center left', child=box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes, borderpad=0.)
+    anchored_box = AnchoredAuxTransformBox(loc='center left', child=box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes)
     ax2.add_artist(anchored_box)
     make_draggable(anchored_box)
     check.on_clicked(update_images)
