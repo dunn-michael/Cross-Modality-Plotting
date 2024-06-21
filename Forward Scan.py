@@ -293,7 +293,7 @@ def on_key(event):
     fig.canvas.flush_events()
 
 def update_images(label):
-    index = int(label.split(' ')[-1])
+    index = int(label.split(' ')[-1]) - 1
     image_artists[index].set_visible(not image_artists[index].get_visible())
     # plt.draw()
     fig.canvas.draw_idle()
@@ -399,11 +399,10 @@ def main():
             img_height = ds.RasterYSize * abs(neg_y_pixel_length)
             img_extent = [x_coord, x_coord + img_width, y_coord - img_height, y_coord]
             img_artist = ax2.imshow(img, extent=img_extent, origin='upper')
-            # img_artist = ax2.imshow(img, extent=img_extent, origin='upper', alpha=0.7)
 
             image_artists.append(img_artist)
             img_artist.set_visible(False)
-            check_labels.append(f'Image {i}')
+            check_labels.append(f'Image {i + 1}')
             file_long.append(x_coord)
             file_lat.append(y_coord)
             
