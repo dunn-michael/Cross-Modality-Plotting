@@ -323,11 +323,17 @@ def on_key(event):
     fig.canvas.flush_events()
 
 def update_images(label):
-    index = int(label.split(' ')[-1]) - 1
-    image_artists[index].set_visible(not image_artists[index].get_visible())
-    # plt.draw()
-    fig.canvas.draw_idle()
-    fig.canvas.flush_events()
+    index = int(label.split()[1])
+    visible = not image_artists[index].get_visible()
+    image_artists[index].set_visible(visible)
+    plt.draw()
+
+
+    # index = int(label.split(' ')[-1]) - 1
+    # image_artists[index].set_visible(not image_artists[index].get_visible())
+    # # plt.draw()
+    # fig.canvas.draw_idle()
+    # fig.canvas.flush_events()
 
 def main():
     global quitGraph
@@ -441,7 +447,7 @@ def main():
 
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
-    
+
     box = AuxTransformBox(ax2.transAxes)
     check = CheckButtons(box, check_labels, [False] * len(check_labels))
     anchored_box = AnchoredOffsetbox(loc='center left', child=box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes, borderpad=0.)
