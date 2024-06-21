@@ -1,0 +1,22 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from wamv_interfaces/msg/BlueprintOculusSonarImage.msg
+// generated code does not contain a copyright notice
+
+
+module wamv_interfaces {
+  module msg {
+    struct BlueprintOculusSonarImage {
+      int64 timestamp;
+
+      int32 height;
+
+      int32 width;
+
+      string encoding;
+
+      int16 is_bigendian;
+
+      sequence<int16> data;
+    };
+  };
+};

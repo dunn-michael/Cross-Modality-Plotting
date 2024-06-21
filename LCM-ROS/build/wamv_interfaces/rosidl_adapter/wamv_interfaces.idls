@@ -1,0 +1,6 @@
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/BlueprintOculusSonarFire.idl
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/BlueprintOculusSonarPing.idl
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/BlueprintOculusSonarImage.idl
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/MicrostrainEst.idl
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/MicrostrainImu.idl
+/home/mdunn15/Downloads/lcm-ros2_bridge/build/wamv_interfaces/rosidl_adapter/wamv_interfaces:msg/MicrostrainGnss.idl
