@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D
-import matplotlib.gridspec as gridspec
 from osgeo import gdal
 from PIL import Image
 from matplotlib.widgets import CheckButtons
-import os
 from tkinter import filedialog
+from mpl_toolkits import make_axes_locatable
 
 lat = []
 long = []
@@ -372,18 +372,9 @@ def main():
                 break
 
     update_mode(mode, partNumber)
-    fig = plt.figure(figsize=(15,8))
-    # ax2 = fig.add_subplot(121)
-    # ax = fig.add_subplot(122, projection='polar')
-
-    gs = gridspec.GridSpec(2,3, width_ratios=[1,4,3])
-
-    check_ax = fig.add_subplot(gs[:,0])
-    ax2 = fig.add_subplot(gs[:,1])
-    ax = fig.add_subplot(gs[:,2], projection='polar')
-
-    check_ax.axis('off')
-
+    fig = plt.figure()
+    ax2 = fig.add_subplot(121)
+    ax = fig.add_subplot(122, projection='polar')
     ax.set_thetamin(-horizontal_aperture / 2)
     ax.set_thetamax(horizontal_aperture / 2)
     theta = np.linspace(-horizontal_aperture / 2, horizontal_aperture / 2, width) * np.pi / 180
@@ -421,9 +412,8 @@ def main():
 
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
-    # rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
-    # check = CheckButtons(rax, check_labels, [False] * len(check_labels))
-    check = CheckButtons(check_ax, check_labels, [False] * len(check_labels))
+    rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
+    check = CheckButtons(rax, check_labels, [False] * len(check_labels))
     check.on_clicked(update_images)
 
     scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
