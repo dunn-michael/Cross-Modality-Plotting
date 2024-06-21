@@ -347,8 +347,8 @@ def main():
     sidescan_images = sorted(sidescan_images)
     tfw_files = sorted(tfw_files)
 
-    courseInfo = np.load('Plotting/course-info.npy')
-    npzfile = np.load("Plotting/oculus-data.npz")
+    courseInfo = np.load('LCM-ROS/lcm-ros2_bridge/course-info.npy')
+    npzfile = np.load("LCM-ROS/lcm-ros2_bridge/oculus-data.npz")
     index = 0
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]

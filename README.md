@@ -21,7 +21,7 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 Note: You only need to do this if you have not already generated the course-info and oculus-data files
 
-Navigate to the lcm-ros2_bridge foler and run "source install/setup.bash"
+Navigate to the lcm-ros2_bridge folder and run "source install/setup.bash"
 
 Run the command `colcon build`
 
@@ -37,6 +37,7 @@ run "ros2 run bag_subscriber data_subscriber",
 then run the `ros2 bag play [filename]`
 
 Again once the "I heard" messages stop appearing, cancel the program.
-Once both of those are done move the "oculus-data.npz" and the "course-info.npy" files into the same directory as your program (the plotting folder).
+
+After all this is done you can then proceed to the graphing section
 
 Note : After running the rosbag it might take a little while for the messages to start appearing, you may want to use the up and down arrow keys to slow down or speed up the rate at which the messages get sent. However, if you speed them up too much the program may crash or miss some messages
