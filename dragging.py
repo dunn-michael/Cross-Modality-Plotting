@@ -29,6 +29,34 @@ image_artists = []
 zoomed = False
 path = False
 
+def make_draggable(artist):
+    """Make matplotlib artist draggable."""
+    artist.press = None
+
+    def on_press(event):
+        if event.inaxes != artist: return
+        contains, attrd = artist.contains(event)
+        if not contains: return
+        artist.press = artist.get_frame(), event.xdata, event.ydata
+
+    def on_motion(event):
+        if artist.press is None: return
+        if event.inaxes != artist: return
+        frame, xpress, ypress = artist.press
+        dx = event.xdata - xpress
+        dy = event.ydata - ypress
+        artist.set_x(frame.get_x() + dx)
+        artist.set_y(frame.get_y() + dy)
+        artist.figure.canvas.draw()
+
+    def on_release(event):
+        artist.press = None
+        artist.figure.canvas.draw()
+
+    artist.figure.canvas.mpl_connect('button_press_event', on_press)
+    artist.figure.canvas.mpl_connect('motion_notify_event', on_motion)
+    artist.figure.canvas.mpl_connect('button_release_event', on_release)
+
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
 
@@ -412,9 +440,12 @@ def main():
 
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
-    rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
+    divider = make_axes_locatable(ax2)
+    rax = divider.append_axes("right", size="10%", pad=0.05)
     check = CheckButtons(rax, check_labels, [False] * len(check_labels))
+    make_draggable(rax)
     check.on_clicked(update_images)
+
 
     scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
     scatter.set_visible(False)
