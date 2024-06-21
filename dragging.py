@@ -8,7 +8,7 @@ from osgeo import gdal
 from PIL import Image
 from matplotlib.widgets import CheckButtons
 from tkinter import filedialog
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredAuxTransformBox
+from matplotlib.offsetbox import AnchoredOffsetbox
 from matplotlib.offsetbox import AuxTransformBox
 
 lat = []
@@ -32,31 +32,20 @@ path = False
 
 def make_draggable(artist):
     """Make matplotlib artist draggable."""
-    artist.press = None
-
     def on_press(event):
-        if event.inaxes != artist.ax: return
-        contains, attrd = artist.contains(event)
-        if not contains: return
-        artist.press = artist.get_window_extent(), event.xdata, event.ydata
-
-    def on_motion(event):
-        if artist.press is None: return
-        if event.inaxes != artist.ax: return
-        bbox, xpress, ypress = artist.press
-        dx = event.xdata - xpress
-        dy = event.ydata - ypress
-        bbox = bbox.translated(dx, dy)
-        artist.set_bbox_to_anchor(bbox)
-        artist.ax.figure.canvas.draw()
-
+        artist.press(event)
     def on_release(event):
-        artist.press = None
-        artist.ax.figure.canvas.draw()
+        artist.release(event)
+    def on_motion(event):
+        artist.motion(event)
 
-    artist.ax.figure.canvas.mpl_connect('button_press_event', on_press)
-    artist.ax.figure.canvas.mpl_connect('motion_notify_event', on_motion)
-    artist.ax.figure.canvas.mpl_connect('button_release_event', on_release)
+    artist.press = lambda event: None
+    artist.release = lambda event: None
+    artist.motion = lambda event: None
+
+    artist.figure.canvas.mpl_connect('button_press_event', on_press)
+    artist.figure.canvas.mpl_connect('button_release_event', on_release)
+    artist.figure.canvas.mpl_connect('motion_notify_event', on_motion)
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -450,13 +439,14 @@ def main():
 
     check = CheckButtons(fig.add_axes([0.91, 0.4, 0.08, 0.15]), check_labels, [False] * len(check_labels))
     check.on_clicked(update_images)
-    
-    anchored_box = AnchoredAuxTransformBox(loc='center left', child=check, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes, transform=ax2.transAxes)
+
+    aux_box = AuxTransformBox(ax2.transAxes)
+    aux_box.add_artist(check)
+
+    # AnchoredOffsetbox to position AuxTransformBox
+    anchored_box = AnchoredOffsetbox(loc='center left', child=aux_box, pad=0.5, frameon=True, bbox_to_anchor=(1.05, 0.5), bbox_transform=ax2.transAxes)
     ax2.add_artist(anchored_box)
     make_draggable(anchored_box)
-
-
-
 
     scatter = ax2.scatter(long,lat, marker='o', zorder = 0)
     scatter.set_visible(False)
