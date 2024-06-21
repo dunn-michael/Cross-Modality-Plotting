@@ -329,7 +329,7 @@ def main():
 
     choice = ''
     while choice != 'type' and choice != 'choose':
-        choice = input("Would you like to type your file directory or choose it? (type / choose)").lower()
+        choice = input("Would you like to type your file directory or choose it? (type / choose) : ").lower()
 
     if choice == 'choose':
         # Tk().withdraw() # prevents an empty tkinter window from appearing
@@ -347,8 +347,8 @@ def main():
     sidescan_images = sorted(sidescan_images)
     tfw_files = sorted(tfw_files)
 
-    courseInfo = np.load('course-info.npy')
-    npzfile = np.load("oculus-data.npz")
+    courseInfo = np.load('Plotting/course-info.npy')
+    npzfile = np.load("Plotting/oculus-data.npz")
     index = 0
     timestamp_npz = npzfile['arr_0'][index]
     data = npzfile['arr_1'][index]
