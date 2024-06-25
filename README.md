@@ -17,6 +17,8 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 'z' will zoom in on the selected index
 
+'m' will print the index and coordinates of the data point closest to where you clicked in the terminal
+
 # ROS
 
 Note: You only need to do this if you have not already generated the course-info and oculus-data files
