@@ -30,6 +30,7 @@ zoomed = False
 path = False
 print_coords = False
 show_title = True
+show_checkbox = True
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -257,6 +258,7 @@ def on_key(event):
     global scatter
     global print_coords
     global show_title
+    global show_checkbox
 
     if selected_index is None:
         return
@@ -279,8 +281,13 @@ def on_key(event):
 
     if event.key == 'm':
         print_coords = not print_coords
+
     if event.key == 't':
         show_title = not show_title
+
+    if event.key == 'h':
+        show_checkbox = not show_checkbox
+        check_ax.set_visible(show_checkbox)
 
     if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
@@ -310,9 +317,13 @@ def on_key(event):
 def update_images(label):
     index = int(label.split(' ')[-1]) - 1
     image_artists[index].set_visible(not image_artists[index].get_visible())
-    # plt.draw()
     fig.canvas.draw_idle()
     fig.canvas.flush_events()
+    # index = int(label.split(' ')[-1]) - 1
+    # image_artists[index].set_visible(not image_artists[index].get_visible())
+    # fig.canvas.draw_idle()
+    # fig.canvas.flush_events()
+
 
 def main():
     global quitGraph
@@ -333,6 +344,7 @@ def main():
     global img_height
     global img_width
     global scatter
+    global check_ax
 
     file_long = []
     file_lat  = []
@@ -436,8 +448,6 @@ def main():
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
     ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
-    # rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
-    # check = CheckButtons(rax, check_labels, [False] * len(check_labels))
     check = CheckButtons(check_ax, check_labels, [False] * len(check_labels))
     check.on_clicked(update_images)
 
