@@ -36,4 +36,33 @@ def func(label):
 
 check.on_clicked(func)
 
+# Initial state
+checkbox_visible = True
+line_visibility = [l.get_visible() for l in [l1, l2]]
+
+# Key event handler
+def on_key(event):
+    global checkbox_visible, line_visibility
+    if event.key == 'h':
+        checkbox_visible = not checkbox_visible
+        rax.set_visible(checkbox_visible)
+        for rect in check.rectangles:
+            rect.set_visible(checkbox_visible)
+        for label in check.labels:
+            label.set_visible(checkbox_visible)
+        for line in check.lines:
+            for l in line:
+                l.set_visible(checkbox_visible)
+        if checkbox_visible:
+            for i, line in enumerate([l1, l2]):
+                line.set_visible(line_visibility[i])
+        else:
+            line_visibility = [l.get_visible() for l in [l1, l2]]
+            for line in [l1, l2]:
+                line.set_visible(False)
+        plt.draw()
+
+# Connect key event
+fig.canvas.mpl_connect('key_press_event', on_key)
+
 plt.show()
