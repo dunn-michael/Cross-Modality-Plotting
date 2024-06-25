@@ -13,11 +13,13 @@ Left and Right keys navigate through the index one at a time
 Note : At the beginning of the index the left arrow key will loop you to the ending index and at the ending index the right arrow key will loop you to the beginning index
 Up and Down arrow keys navigte through the index 5 at a time
 
-'p' will show the path
+'p' will hide/show the path
 
-'z' will zoom in on the selected index
+'z' will zoom in/out on the selected index
 
 'm' will print the index and coordinates of the data point closest to where you clicked in the terminal
+
+'t' will hide/show the title
 
 # ROS
 
@@ -65,4 +67,3 @@ If you are having usses installing GDAL try this
 
 # TODO
 Button to toggle image button
-have title of image be togglable - multiline

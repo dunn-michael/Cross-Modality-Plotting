@@ -29,6 +29,7 @@ image_artists = []
 zoomed = False
 path = False
 print_coords = False
+show_title = True
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -169,7 +170,10 @@ def update_highlight():
     rad_heading = deg2rad(heading[selected_index])
     ax.set_theta_offset(rad_heading)
     ax2.add_patch(highlight_patch)
-    ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
+    if show_title:
+        ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
+    else: 
+        ax2.set_title('')
 
 def deg2rad(deg):
     """Converts degrees to radians"""
@@ -252,6 +256,7 @@ def on_key(event):
     global path
     global scatter
     global print_coords
+    global show_title
 
     if selected_index is None:
         return
@@ -274,6 +279,8 @@ def on_key(event):
 
     if event.key == 'm':
         print_coords = not print_coords
+    if event.key == 't':
+        show_title = not show_title
 
     if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
