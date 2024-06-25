@@ -41,3 +41,15 @@ Again once the "I heard" messages stop appearing, cancel the program.
 After all this is done you can then proceed to the graphing section
 
 Note : After running the rosbag it might take a little while for the messages to start appearing, you may want to use the up and down arrow keys to slow down or speed up the rate at which the messages get sent. However, if you speed them up too much the program may crash or miss some messages
+
+# Debug
+
+On Ubuntu to install osgeo you may need to run this code
+
+`sudo add-apt-repository ppa:ubuntugis/ppa
+sudo apt-get update
+sudo apt-get install gdal-bin
+sudo apt-get install libgdal-dev
+export CPLUS_INCLUDE_PATH=/usr/include/gdal
+export C_INCLUDE_PATH=/usr/include/gdal
+pip install GDAL`
