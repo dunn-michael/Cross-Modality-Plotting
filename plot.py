@@ -448,7 +448,8 @@ def main():
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
     ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
-    check = CheckButtons(check_ax, check_labels, [False] * len(check_labels))
+    check = CheckButtons(check_ax, check_labels, [False] * len(check_labels), useblit=False)
+    
     check.on_clicked(update_images)
 
     scatter = ax2.scatter(long,lat, marker='o', zorder = 0)

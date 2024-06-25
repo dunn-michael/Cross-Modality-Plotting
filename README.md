@@ -21,6 +21,8 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 't' will hide/show the title
 
+'h' will hide/show the checkboxes
+
 # ROS
 
 Note: You only need to do this if you have not already generated the course-info and oculus-data files
@@ -64,6 +66,3 @@ pip install GDAL
 If you are having usses installing GDAL try this
 
 `pip install GDAL==3.4.1`
-
-# TODO
-Button to toggle image button
