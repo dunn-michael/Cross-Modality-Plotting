@@ -17,8 +17,6 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 'z' will zoom in on the selected index
 
-'m' will print the index and coordinates of the data point closest to where you clicked in the terminal
-
 # ROS
 
 Note: You only need to do this if you have not already generated the course-info and oculus-data files
@@ -48,14 +46,21 @@ Note : After running the rosbag it might take a little while for the messages to
 
 On Ubuntu to install osgeo you may need to run this code
 
-`sudo add-apt-repository ppa:ubuntugis/ppa
+```
+sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
 sudo apt-get install gdal-bin
 sudo apt-get install libgdal-dev
 export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
-pip install GDAL`
+pip install GDAL
+```
 
-Maybe try
+
+If you are having usses installing GDAL try this
 
 `pip install GDAL==3.4.1`
+
+# TODO
+Button to toggle image button
+have title of image be togglable - multiline

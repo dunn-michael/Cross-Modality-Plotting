@@ -28,7 +28,6 @@ highlight_patch = None
 image_artists = []
 zoomed = False
 path = False
-print_coords = False
 
 def meters_to_degrees(meters):
     """Changes the unit from meters to degrees so it can be plotted on lat and long graph"""
@@ -169,6 +168,7 @@ def update_highlight():
     rad_heading = deg2rad(heading[selected_index])
     ax.set_theta_offset(rad_heading)
     ax2.add_patch(highlight_patch)
+    ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
 
 def deg2rad(deg):
     """Converts degrees to radians"""
@@ -202,37 +202,31 @@ def on_click(event):
 
         click_x, click_y = event.xdata, event.ydata
 
-        if print_coords:
-            print(f"Click coordinates: longitude={click_x}, latitude={click_y}")
+        print(f"Click coordinates: longitude={click_x}, latitude={click_y}")
 
         if click_x is None or click_y is None:
-            if(print_coords):
-                print("Click coordinates are None, skipping...")
+            print("Click coordinates are None, skipping...")
             return
 
 
         distances = np.array([haversine(click_x, click_y, lon, lati) for lon, lati in zip(long, lat)])
 
         if distances.size == 0:
-            if print_coords:
-                print("Distances array is empty, skipping...")
+            print("Distances array is empty, skipping...")
             return
 
         if distances.ndim != 1:
-            if print_coords:
-                print(f"Distances array has unexpected shape: {distances.shape}, skipping...")
+            print(f"Distances array has unexpected shape: {distances.shape}, skipping...")
             return
 
         selected_index = np.argmin(distances)
         
 
         selected_index = int(selected_index)
-        if print_coords:
-            print(f"Closest index: {selected_index}")
+        print(f"Closest index: {selected_index}")
         closest_x = long[selected_index]
         closest_y = lat[selected_index]
-        if print_coords:
-            print(f"Clicked on point: (longitude={closest_x}, latitude={closest_y})")
+        print(f"Clicked on point: (longitude={closest_x}, latitude={closest_y})")
         update_highlight()
 
         data = npzfile['arr_1'][selected_index]
@@ -250,7 +244,6 @@ def on_key(event):
     global selected_index
     global path
     global scatter
-    global print_coords
 
     if selected_index is None:
         return
@@ -270,9 +263,6 @@ def on_key(event):
     if event.key == "p":
         path = not path
         scatter.set_visible(path)
-
-    if event.key == 'm':
-        print_coords = not print_coords
 
     if event.key == 'right':
         selected_index = (selected_index + 1) % len(long)
@@ -427,6 +417,7 @@ def main():
 
     ax2.set_xlim(xax_min, xax_max + img_width)
     ax2.set_ylim(yax_min - img_height, yax_max)
+    ax2.set_title("Index : {0}, Longitude : {1}, Latitude : {2}".format(selected_index, long[selected_index],lat[selected_index]))
     # rax = plt.axes([0.1, 0.8, 0.20, 0.20,])
     # check = CheckButtons(rax, check_labels, [False] * len(check_labels))
     check = CheckButtons(check_ax, check_labels, [False] * len(check_labels))
