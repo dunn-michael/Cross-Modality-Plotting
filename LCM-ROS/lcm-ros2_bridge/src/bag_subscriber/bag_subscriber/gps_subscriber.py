@@ -19,9 +19,9 @@ class MinimalSubscriber(Node):
         self.get_logger().info('I heard: Lat: "%s", Long: "%s", Timestamp: "%s", Heading: "%s"' % (msg.latitude, msg.longitude, msg.timestamp, msg.heading))
         data.append([msg.latitude, msg.longitude, msg.timestamp, msg.heading])
         np.save("course-info", data)
-
-        with open('lat_long_data.txt', 'a') as f:  # Open file in append mode
-            f.write('Latitude: {}, Longitude: {}, Timestamp: {}, Heading: {}\n'.format(msg.latitude, msg.longitude, msg.timestamp, msg.heading))
+        
+        # with open('lat_long_data.txt', 'a') as f:  # Open file in append mode
+        #     f.write('Latitude: {}, Longitude: {}, Timestamp: {}, Heading: {}\n'.format(msg.latitude, msg.longitude, msg.timestamp, msg.heading))
 
 
 def main(args=None):
