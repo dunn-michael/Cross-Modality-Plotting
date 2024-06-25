@@ -17,7 +17,7 @@ Up and Down arrow keys navigte through the index 5 at a time
 
 'z' will zoom in on the selected index
 
-'l' will print the index and coordinates of the data point closest to where you clicked in the terminal
+'m' will print the index and coordinates of the data point closest to where you clicked in the terminal
 
 # ROS
 
